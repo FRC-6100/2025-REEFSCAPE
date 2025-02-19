@@ -99,4 +99,81 @@ public final class Constants {
   public static final class NeoMotorConstants {
     public static final double kFreeSpeedRpm = 5676;
   }
+
+  /********************************************************************* 
+   * This and below is from Posiedon Robot Constants
+  **********************************************************/
+
+  // Spark MAX CAN IDs //
+  public static final int INTAKE_BAR_MOTOR_ID = 0; // TODO fix this ID NEO 550 motor
+  public static final int INTAKE_ARM_MOTOR_ID = 0; // TODO NEO motor
+  public static final int ELEVATOR_STAGE_1_MOTOR_ID = 0; // TODO NEO motor
+  public static final int ELEVATOR_STAGE_2_MOTOR_ID = 0; // TODO NEO 550 motor
+  public static final int END_EFFECTOR_WHEEL_MOTOR_ID = 0; // TODO NEO 550 motor
+  public static final int END_EFFECTOR_ARM_MOTOR_ID = 0; // TODO NEO 550 motor
+
+  // Servo IDs //
+  public static final int ELEVATOR_DROP_MOTOR_ID = 0; // TODO
+
+  // PWM Ports //
+  public static final int LED_PWM_ID = 4; // TODO
+
+  // DIO (Digital Input/Output) Channels //
+  // Example: public static final int RIGHT_ENCODER_CHANNEL_A = 0;
+  // Example: public static final int RIGHT_ENCODER_CHANNEL_B = 1;
+  // Example: public static final int LEFT_ENCODER_CHANNEL_A = 2;
+  // Example: public static final int LEFT_ENCODER_CHANNEL_B = 3;
+
+
+  // Coral Elevator Constants // TODO These should all be checked at some point BUT probably not needed
+  public static final boolean ELEVATOR_STAGE_1_INVERT = true; 
+  public static final boolean ELEVATOR_STAGE_2_INVERT = true;
+  public static final boolean ELEVATOR_WHEEL_INVERT = true;
+  public static final boolean ELEVATOR_ARM_INVERT = true;
+  public static final double ELEVATOR_SPEED = 0.2;
+  public static final double ARM_SPEED = 0.2;
+  public static final double WHEEL_SPEED = 0.6;
+  public static final double ARM_GRAVITY_CONST = -0.03;
+  public static final int ELEVATOR_ROTATIONS_PER_INCH = 13; // Number of rotations elevator climb motor must complete to
+                                                            // raise/lower elevator by one inch
+
+  // Intake Constants // TODO These should all be checked at some point
+  public static final double INTAKE_LIFT_GEAR_RATIO = 3 * 7 * 7 * 48 / 29;
+
+  public static final double INTAKE_ARM_MAX_POWER = 0.1;
+  public static final double INTAKE_ARM_MIN_POWER = 0.05;
+  public static final double INTAKE_ARM_kP = 0.025;
+
+  public static final double INTAKE_DEPLOY_LIMIT = 51;
+  public static final double INTAKE_RETURN_LIMIT = 0;
+
+  public static final boolean INTAKE_ARM_INVERT = true;
+  public static final double DEPLOY_SPEED = 0.1;
+  public static final boolean INTAKE_BAR_INVERT = false;
+  public static final double INTAKE_BAR_SPEED = 0.8;
+
+  public static final double PICK_UP_ALGAE_POSITION = 33;
+  public static final double HOLD_ALGAE_POSITION = 2.0;
+  public static final double PICK_UP_CORAL_POSITION = 53;
+  public static final double HOLD_CORAL_POSITION = 24;
+
+  public static final double GRAVITY_RESISTANCE = 0.05;
+
+  // REV PH Channels //
+  // Example: public static final int EXTENSION_SOLENOID_ID = 0;
+
+  // Rev PDH Constants //
+/*
+  public static final int INTAKE_BAR_MOTOR_PDH_CHANNEL = 1; 
+  public static final int INTAKE_DEPLOY_MOTOR_PDH_CHANNEL = 2; 
+  public static final int ELEVATOR_STAGE_1_MOTOR_PDH_CHANNEL = 3; 
+  public static final int ELEVATOR_STAGE_2_MOTOR_PDH_CHANNEL = 4; 
+  public static final int ELEVATOR_ARM_MOTOR_PDH_CHANNEL = 5; 
+  public static final int ELEVATOR_WHEEL_MOTOR_PDH_CHANNEL = 6; 
+  public static final int LEFT_FRONT_DRIVE_MOTOR_PDH_CHANNEL = 11; 
+  public static final int RIGHT_FRONT_DRIVE_MOTOR_PDH_CHANNEL = 10;
+  public static final int LEFT_BACK_DRIVE_MOTOR_PDH_CHANNEL = 12; 
+  public static final int RIGHT_BACK_DRIVE_MOTOR_PDH_CHANNEL = 13; 
+ */
+
 }
