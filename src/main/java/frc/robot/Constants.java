@@ -46,17 +46,17 @@ public final class Constants {
     public static final double kBackRightChassisAngularOffset = Math.PI / 2;
 
     // SPARK MAX CAN IDs
-    public static final int kFrontLeftDrivingCanId = 11;
-    public static final int kRearLeftDrivingCanId = 13;
-    public static final int kFrontRightDrivingCanId = 15;
-    public static final int kRearRightDrivingCanId = 17;
+    public static final int kFrontLeftDrivingCanId = 1; // TODO All of these numbers need to match with REV Hardware Client. 
+    public static final int kRearLeftDrivingCanId = 3;
+    public static final int kFrontRightDrivingCanId = 5;
+    public static final int kRearRightDrivingCanId = 7;
 
-    public static final int kFrontLeftTurningCanId = 10;
-    public static final int kRearLeftTurningCanId = 12;
-    public static final int kFrontRightTurningCanId = 14;
-    public static final int kRearRightTurningCanId = 16;
+    public static final int kFrontLeftTurningCanId = 2;
+    public static final int kRearLeftTurningCanId = 4;
+    public static final int kFrontRightTurningCanId = 6;
+    public static final int kRearRightTurningCanId = 8;
 
-    public static final boolean kGyroReversed = false;
+    public static final boolean kGyroReversed = false; // TODO Check gyro and rio orientation with respect to mechanical front of the robot
   }
 
   public static final class ModuleConstants {
@@ -116,7 +116,7 @@ public final class Constants {
   public static final int ELEVATOR_DROP_MOTOR_ID = 0; // TODO
 
   // PWM Ports //
-  public static final int LED_PWM_ID = 4; // TODO
+  // public static final int LED_PWM_ID = 4; // TODO
 
   // DIO (Digital Input/Output) Channels //
   // Example: public static final int RIGHT_ENCODER_CHANNEL_A = 0;
