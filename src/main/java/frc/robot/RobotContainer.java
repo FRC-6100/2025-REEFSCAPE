@@ -18,7 +18,9 @@ import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.EndEffectorWheelCommand;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.EndEffectorSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
@@ -40,6 +42,9 @@ public class RobotContainer {
 
   private final CommandXboxController driverController = new CommandXboxController(0);
   private final CommandXboxController operatorController = new CommandXboxController(1);
+
+
+ private final EndEffectorSubsystem m_endEffector = new EndEffectorSubsystem();
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -85,9 +90,11 @@ public class RobotContainer {
     // driverController.povRight().whileTrue()); // Sets drive speed to 0.75
     // driverController.povLeft().whileTrue(); // Sets drive speed to 0.25
 
-    // driverController.leftBumper().whileTrue(); // intake piece
-    // driverController.rightBumper().whileTrue(); // outake piece 
-    
+    operatorController.rightBumper().whileTrue(new EndEffectorWheelCommand(
+      m_endEffector,() -> -0.6)); // TODO Check the sign
+
+    operatorController.rightBumper().whileTrue(new EndEffectorWheelCommand(
+        m_endEffector,() -> 0.6)); // TODO Check the sign
   }
 
   /**

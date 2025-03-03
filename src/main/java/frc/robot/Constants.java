@@ -157,6 +157,10 @@ public final class Constants {
 
   public static final double GRAVITY_RESISTANCE = 0.05;
 
+   // Power settings for the wheel
+   public final double WHEEL_FORWARD_POWER = 0.6;  // Positive power for forward
+   public final double WHEEL_REVERSE_POWER = -0.6; // Negative power for reverse
+
   // REV PH Channels //
   // Example: public static final int EXTENSION_SOLENOID_ID = 0;
 
