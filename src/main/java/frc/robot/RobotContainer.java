@@ -93,7 +93,7 @@ public class RobotContainer {
     operatorController.rightBumper().whileTrue(new EndEffectorWheelCommand(
       m_endEffector,() -> -0.6)); // TODO Check the sign
 
-    operatorController.rightBumper().whileTrue(new EndEffectorWheelCommand(
+    operatorController.leftBumper().whileTrue(new EndEffectorWheelCommand(
         m_endEffector,() -> 0.6)); // TODO Check the sign
   }
 
