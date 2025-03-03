@@ -2,23 +2,22 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands;
+package frc.robot.commands.CurrentlyUnused;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
-
 import frc.robot.subsystems.IntakeSubsystem;
 
-public class IntakePickUpAlgaeCommand extends Command {
+public class IntakePickUpCoralCommand extends Command {
 
   private IntakeSubsystem m_intakeSubsystem;
 
-  private double goalPosition = Constants.PICK_UP_ALGAE_POSITION;
+  private double goalPosition = Constants.PICK_UP_CORAL_POSITION;
   private double positionError;
   private double kP = Constants.INTAKE_ARM_kP;
 
-  /** Creates a new IntakePickUpAlgaeCommand. */
-  public IntakePickUpAlgaeCommand() {
+  /** Creates a new IntakePickUpCoralCommand. */
+  public IntakePickUpCoralCommand() {
     m_intakeSubsystem = new IntakeSubsystem();
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_intakeSubsystem);
