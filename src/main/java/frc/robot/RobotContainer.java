@@ -18,10 +18,12 @@ import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.EndEffectorArmIncrementalCommand;
 import frc.robot.commands.EndEffectorWheelCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.EndEffectorSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -45,6 +47,8 @@ public class RobotContainer {
 
 
  private final EndEffectorSubsystem m_endEffector = new EndEffectorSubsystem();
+
+ final double ARM_INCREMENT_AMOUNT = 0.2; // Adjust this value as needed
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -90,11 +94,24 @@ public class RobotContainer {
     // driverController.povRight().whileTrue()); // Sets drive speed to 0.75
     // driverController.povLeft().whileTrue(); // Sets drive speed to 0.25
 
-    operatorController.rightBumper().whileTrue(new EndEffectorWheelCommand(
-      m_endEffector,() -> -0.6)); // TODO Check the sign
+    operatorController.rightBumper().whileTrue(
+        new EndEffectorWheelCommand(
+          m_endEffector,() -> -0.6)); // TODO Check the sign
 
-    operatorController.leftBumper().whileTrue(new EndEffectorWheelCommand(
-        m_endEffector,() -> 0.6)); // TODO Check the sign
+    operatorController.leftBumper().whileTrue(
+        new EndEffectorWheelCommand(
+          m_endEffector,() -> 0.6)); // TODO Check the sign
+
+    // Create a single arm incremental command as the default command for the subsystem
+    m_endEffector.setDefaultCommand(
+        new EndEffectorArmIncrementalCommand(
+            m_endEffector,
+            () -> operatorController.x().getAsBoolean(), // Positive increment with X button
+            () -> operatorController.b().getAsBoolean(), // Negative increment with B button
+            ARM_INCREMENT_AMOUNT
+        )
+    );
+      
   }
 
   /**

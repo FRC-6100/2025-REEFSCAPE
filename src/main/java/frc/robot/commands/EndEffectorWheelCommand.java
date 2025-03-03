@@ -1,4 +1,3 @@
-// Author: Created March 2025
 package frc.robot.commands;
 
 import java.util.function.DoubleSupplier;
@@ -40,13 +39,13 @@ public class EndEffectorWheelCommand extends Command {
         double power = m_powerSupplier.getAsDouble();
         
         // Apply the power to the wheel motor
-        m_endEffectorWheel.setSpeed(power);
+        m_endEffectorWheel.setWheelSpeed(power);
     }
 
     @Override
     public void end(boolean interrupted) {
         // Stop wheel motor when command ends
-        m_endEffectorWheel.stop();
+        m_endEffectorWheel.stopWheel();
     }
 
     @Override
