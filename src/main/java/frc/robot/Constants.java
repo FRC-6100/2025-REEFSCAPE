@@ -46,17 +46,17 @@ public final class Constants {
     public static final double kBackRightChassisAngularOffset = Math.PI / 2;
 
     // SPARK MAX CAN IDs
-    public static final int kFrontLeftDrivingCanId = 1; // TODO All of these numbers need to match with REV Hardware Client. 
-    public static final int kRearLeftDrivingCanId = 3;
+    public static final int kFrontLeftDrivingCanId = 7;
+    public static final int kRearLeftDrivingCanId = 1;
     public static final int kFrontRightDrivingCanId = 5;
-    public static final int kRearRightDrivingCanId = 7;
+    public static final int kRearRightDrivingCanId = 3;
 
-    public static final int kFrontLeftTurningCanId = 2;
-    public static final int kRearLeftTurningCanId = 4;
+    public static final int kFrontLeftTurningCanId = 8;
+    public static final int kRearLeftTurningCanId = 2;
     public static final int kFrontRightTurningCanId = 6;
-    public static final int kRearRightTurningCanId = 8;
+    public static final int kRearRightTurningCanId = 4;
 
-    public static final boolean kGyroReversed = false; // TODO Check gyro and rio orientation with respect to mechanical front of the robot
+    public static final boolean kGyroReversed = false;
   }
 
   public static final class ModuleConstants {
@@ -105,18 +105,16 @@ public final class Constants {
   **********************************************************/
 
   // Spark MAX CAN IDs //
-  public static final int INTAKE_BAR_MOTOR_ID = 0; // TODO fix this ID NEO 550 motor
-  public static final int INTAKE_ARM_MOTOR_ID = 0; // TODO NEO motor
-  public static final int ELEVATOR_STAGE_1_MOTOR_ID = 0; // TODO NEO motor
-  public static final int ELEVATOR_STAGE_2_MOTOR_ID = 0; // TODO NEO 550 motor
-  public static final int END_EFFECTOR_WHEEL_MOTOR_ID = 0; // TODO NEO 550 motor
-  public static final int END_EFFECTOR_ARM_MOTOR_ID = 0; // TODO NEO 550 motor
+  public static final int INTAKE_BAR_MOTOR_ID = 10; 
+  public static final int INTAKE_ARM_MOTOR_ID = 12; 
+  public static final int ELEVATOR_STAGE_1_MOTOR_ID = 11;
+  public static final int ELEVATOR_STAGE_2_MOTOR_ID = 20;
+  public static final int END_EFFECTOR_WHEEL_MOTOR_ID = 13; 
+  public static final int END_EFFECTOR_ARM_MOTOR_ID = 9; 
 
-  // Servo IDs //
-  public static final int ELEVATOR_DROP_MOTOR_ID = 0; // TODO
 
   // PWM Ports //
-  // public static final int LED_PWM_ID = 4; // TODO
+  public static final int LED_PWM_ID = 4; // TODO
 
   // DIO (Digital Input/Output) Channels //
   // Example: public static final int RIGHT_ENCODER_CHANNEL_A = 0;
