@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.commands.EndEffectorWheelCommand;
+import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.EndEffectorSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -40,10 +41,10 @@ public class RobotContainer {
   private final CommandXboxController driverController = new CommandXboxController(0);
   private final CommandXboxController operatorController = new CommandXboxController(1);
 
+  // declaration to the RobotContainer class
+  private final ArmSubsystem m_arm = new ArmSubsystem();
 
- private final EndEffectorSubsystem m_endEffector = new EndEffectorSubsystem();
-
- final double ARM_INCREMENT_AMOUNT = 0.2; // Adjust this value as needed
+  private final EndEffectorSubsystem m_endEffector = new EndEffectorSubsystem();
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -76,14 +77,15 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
 
-    driverController.a().whileTrue(new RunCommand(() -> m_robotDrive.setX(),m_robotDrive)); // Puts drive into brake mode
+    driverController.a().whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive)); // Puts drive into brake
+                                                                                             // mode
     // driverController.b().whileTrue()); // Puts drive into field oriented mode
     // driverController.x().whileTrue()); // Puts drive into robot oriented mode
     // driverController.y().whileTrue(); // This move to pose 1
-    
+
     // driverController.start().whileTrue(); // Resets the
     // driverController.back().whileTrue(); // Resets the gyro
-    
+
     // driverController.povUp().whileTrue(); // Sets drive speed to 0.5
     // driverController.povDown().whileTrue()); // Sets drive speed to 1
     // driverController.povRight().whileTrue()); // Sets drive speed to 0.75
@@ -91,13 +93,40 @@ public class RobotContainer {
 
     operatorController.rightBumper().whileTrue(
         new EndEffectorWheelCommand(
-          m_endEffector,() -> -0.6)); // TODO Check the sign
+            m_endEffector, () -> -0.6)); // TODO Check the sign
 
     operatorController.leftBumper().whileTrue(
         new EndEffectorWheelCommand(
-          m_endEffector,() -> 0.6)); // TODO Check the sign
+            m_endEffector, () -> 0.6)); // TODO Check the sign
 
-      
+    // Arm position preset buttons using command factories (using operator
+    // controller)
+    operatorController.y().onTrue(m_arm.positionOneCommand());
+    operatorController.a().onTrue(m_arm.positionTwoCommand());
+
+    // Option 1: Using the command factory
+    // This approach doesn't track button state transitions, it applies increments
+    // continuously while the button is held, so be careful with the increment
+    // amount
+    m_arm.setDefaultCommand(
+        m_arm.incrementalCommand(
+            () -> operatorController.povLeft().getAsBoolean(),
+            () -> operatorController.povRight().getAsBoolean(),
+            0.01 // Small increment since this runs continuously
+        ));
+
+    // Option 2: Create a custom command that handles button transitions
+    // // This is similar to your original ArmIncrementalCommand
+    // m_arm.setDefaultCommand(
+    // new IncrementalArmControlCommand(
+    // m_arm,
+    // () -> operatorController.povUp().getAsBoolean(),
+    // () -> operatorController.povDown().getAsBoolean(),
+    // 0.1
+    // )
+    // );
+    // }
+
   }
 
   /**

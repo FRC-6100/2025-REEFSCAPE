@@ -9,40 +9,23 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.AbsoluteEncoder;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.sim.SparkFlexSim;
-import com.revrobotics.sim.SparkLimitSwitchSim;
-import com.revrobotics.sim.SparkMaxSim;
-import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.simulation.ElevatorSim;
-import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Configs;
-import frc.robot.Constants;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class ArmSubsystem extends SubsystemBase {
   private final SparkMax m_motor;
-//   private final PIDController m_pidController;
   private final RelativeEncoder m_encoder;
+  private final SparkClosedLoopController m_controller;
   
   // The two preset positions (in rotations)
   private final double POSITION_ONE = 0.0;  // Adjust based on your desired position
-  private final double POSITION_TWO = 5.0;  // Adjust based on your desired position
+  private final double POSITION_TWO = -20.0;  // Adjust based on your desired position
   
   // Current target position
   private double m_targetPosition = 0;
@@ -51,7 +34,7 @@ public class ArmSubsystem extends SubsystemBase {
   private static final double kP = 0.1;
   private static final double kI = 0;
   private static final double kD = 0;
-  private static final double kFF = 0.05; // Feed forward to counteract gravity
+//   private static final double kFF = 0.05; // Feed forward to counteract gravity
   
   // Constants for position control
   private static final double MAX_OUTPUT = 0.4;  // Limits max speed of the arm
@@ -62,37 +45,30 @@ public class ArmSubsystem extends SubsystemBase {
     // Initialize the motor as a Neo550
     m_motor = new SparkMax(Constants.END_EFFECTOR_ARM_MOTOR_ID, MotorType.kBrushless);
     
-    // Reset motor to factory defaults
-    // m_motor.restoreFactoryDefaults();
-    
     // Configure motor
-    // m_motor.setIdleMode(IdleMode.kBrake);
-    // m_motor.setIdleMode(IdleMode.kBrake); 
-    // m_motor.setSmartCurrentLimit(20); // Appropriate for Neo550
+    SparkMaxConfig config = new SparkMaxConfig();
+    config.idleMode(IdleMode.kBrake);
+    config.smartCurrentLimit(20); // Appropriate for Neo550
+    
+    // Configure PID 
+    config.closedLoop.pid(kP, kI, kD);
+    // config.closedLoop.ff(kFF);
+    config.closedLoop.outputRange(MIN_OUTPUT, MAX_OUTPUT);
+    
+    // Apply configuration
+    // m_motor.applyConfig(config); // FIXME: Not yet supported in the API?!
     
     // Get the encoder
     m_encoder = m_motor.getEncoder();
     
     // Reset encoder position to zero
     m_encoder.setPosition(0);
-
-
     
-    // Get the PID controller
-    // m_pidController = m_motor. getPIDController();
-    
-    // // Configure PID controller
-    // m_pidController.setP(kP);
-    // m_pidController.setI(kI);
-    // m_pidController.setD(kD);
-    // m_pidController.setFF(kFF);
-    // m_pidController.setOutputRange(MIN_OUTPUT, MAX_OUTPUT);
+    // Get the closed loop controller
+    m_controller = m_motor.getClosedLoopController();
     
     // Set initial position target
     m_targetPosition = m_encoder.getPosition();
-    
-    // Save configuration (burnt to flash)
-    // m_motor.burnFlash();
   }
   
   @Override
@@ -134,7 +110,7 @@ public class ArmSubsystem extends SubsystemBase {
     m_targetPosition = position;
     
     // Apply the PID controller to reach the target
-    // m_pidController.setReference(m_targetPosition, CANSparkMax.ControlType.kPosition);
+    m_controller.setReference(m_targetPosition, ControlType.kPosition);
   }
   
   /**
@@ -158,6 +134,59 @@ public class ArmSubsystem extends SubsystemBase {
   public void stop() {
     // When stopped, maintain the current position
     m_targetPosition = m_encoder.getPosition();
-    // m_pidController.setReference(m_targetPosition, CANSparkMax.ControlType.kPosition);
+    m_controller.setReference(m_targetPosition, ControlType.kPosition);
+  }
+  
+  // ==== COMMAND FACTORIES ====
+  
+  /**
+   * Creates a command that moves the arm to position one
+   * @return A command that moves the arm to position one
+   */
+  public Command positionOneCommand() {
+    return Commands.runOnce(() -> setPositionOne(), this)
+        .andThen(Commands.waitUntil(this::isAtTarget));
+  }
+  
+  /**
+   * Creates a command that moves the arm to position two
+   * @return A command that moves the arm to position two
+   */
+  public Command positionTwoCommand() {
+    return Commands.runOnce(() -> setPositionTwo(), this)
+        .andThen(Commands.waitUntil(this::isAtTarget));
+  }
+  
+  /**
+   * Creates a command that moves the arm to a specific position
+   * @param position The target position in rotations
+   * @return A command that moves the arm to the specified position
+   */
+  public Command positionCommand(double position) {
+    return Commands.runOnce(() -> setTargetPosition(position), this)
+        .andThen(Commands.waitUntil(this::isAtTarget));
+  }
+  
+  /**
+   * Creates a command that handles incremental arm movement based on button inputs
+   * @param incrementUp Supplier that returns true when the arm should be moved up
+   * @param incrementDown Supplier that returns true when the arm should be moved down
+   * @param incrementAmount The amount to increment by each time (rotations)
+   * @return A command that handles incremental arm movement
+   */
+  public Command incrementalCommand(
+      BooleanSupplier incrementUp, 
+      BooleanSupplier incrementDown, 
+      double incrementAmount) {
+        
+    return Commands.run(() -> {
+      // Each execution, check if buttons are pressed and apply increments
+      if (incrementUp.getAsBoolean()) {
+        incrementPosition(incrementAmount);
+      }
+      if (incrementDown.getAsBoolean()) {
+        incrementPosition(-incrementAmount);
+      }
+    }, this);
   }
 }
