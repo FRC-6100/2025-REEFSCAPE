@@ -101,8 +101,8 @@ public class RobotContainer {
 
     // Arm position preset buttons using command factories (using operator
     // controller)
-    operatorController.y().onTrue(m_arm.positionOneCommand());
-    operatorController.a().onTrue(m_arm.positionTwoCommand());
+    operatorController.x().onTrue(m_arm.positionOneCommand());
+    operatorController.b().onTrue(m_arm.positionTwoCommand());
 
     // Option 1: Using the command factory
     // This approach doesn't track button state transitions, it applies increments
