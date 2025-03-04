@@ -93,16 +93,29 @@ public class RobotContainer {
 
     operatorController.rightBumper().whileTrue(
         new EndEffectorWheelCommand(
-            m_endEffector, () -> -0.6)); // TODO Check the sign
+            // Change the sign if you want to change the direction of the wheel
+            m_endEffector, () -> -0.6));
 
     operatorController.leftBumper().whileTrue(
         new EndEffectorWheelCommand(
-            m_endEffector, () -> 0.6)); // TODO Check the sign
+            // Change the sign if you want to change the direction of the wheel
+            m_endEffector, () -> 0.6));
 
-    // Arm position preset buttons using command factories (using operator
-    // controller)
-    operatorController.x().onTrue(m_arm.positionOneCommand());
-    operatorController.b().onTrue(m_arm.positionTwoCommand());
+    // Arm position preset buttons using command factories
+    /*
+    TODO Test and adjust the position variables in the ArmSubsystem (lines 31-33 ish)
+    Current values just for reference here.
+    POSITION_ZERO = 0.0;
+    POSITION_ONE = -20.0;
+    POSITION_TWO = -26.0;
+    */
+    
+    // Go to preset POSITION_ZERO variable in ArmSubsystem
+    operatorController.x().onTrue(m_arm.positionZeroCommand());
+    // Go to preset POSITION_ONE variable in ArmSubsystem 
+    operatorController.b().onTrue(m_arm.positionOneCommand());
+    // Go to preset POSITION_TWO variable in ArmSubsystem
+    operatorController.y().onTrue(m_arm.positionTwoCommand());
 
     // Option 1: Using the command factory
     // This approach doesn't track button state transitions, it applies increments
@@ -110,13 +123,15 @@ public class RobotContainer {
     // amount
     m_arm.setDefaultCommand(
         m_arm.incrementalCommand(
+            // Runs an increment command when the up button is held
             () -> operatorController.povLeft().getAsBoolean(),
+            // Runs a increment command when the down button is held
             () -> operatorController.povRight().getAsBoolean(),
-            0.01 // Small increment since this runs continuously
+            // TODO Small increment since this runs continuously
+            0.01 
         ));
 
-    // Option 2: Create a custom command that handles button transitions
-    // // This is similar to your original ArmIncrementalCommand
+    // Option 2 Incremental: Create a custom command that handles button transitions
     // m_arm.setDefaultCommand(
     // new IncrementalArmControlCommand(
     // m_arm,

@@ -23,9 +23,14 @@ public class ArmSubsystem extends SubsystemBase {
   private final RelativeEncoder m_encoder;
   private final SparkClosedLoopController m_controller;
   
-  // The two preset positions (in rotations)
-  private final double POSITION_ONE = 0.0;  // Adjust based on your desired position
-  private final double POSITION_TWO = -20.0;  // Adjust based on your desired position
+  // The preset positions (in rotations)
+  /* Values derived from testing on Monday
+   * May need adjustments
+   * Theoritical max:
+   */
+  private final double POSITION_ZERO = 0.0;  // Adjust based on your desired position
+  private final double POSITION_ONE = -20.0;  // TODO Adjust based on your desired position
+  private final double POSITION_TWO = -26.0;  // Adjust based on your desired position
   
   // Current target position
   private double m_targetPosition = 0;
@@ -77,6 +82,12 @@ public class ArmSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Arm Position", m_encoder.getPosition());
     SmartDashboard.putNumber("Arm Target", m_targetPosition);
     SmartDashboard.putBoolean("Arm At Target", isAtTarget());
+  }
+  /**
+   * Set the arm to position one
+   */
+  public void setPositionZero() {
+    setTargetPosition(POSITION_ZERO);
   }
   
   /**
@@ -143,12 +154,21 @@ public class ArmSubsystem extends SubsystemBase {
    * Creates a command that moves the arm to position one
    * @return A command that moves the arm to position one
    */
+  public Command positionZeroCommand() {
+    return Commands.runOnce(() -> setPositionZero(), this)
+        .andThen(Commands.waitUntil(this::isAtTarget));
+  }
+  
+  /**
+   * Creates a command that moves the arm to position one
+   * @return A command that moves the arm to position one
+   */
   public Command positionOneCommand() {
     return Commands.runOnce(() -> setPositionOne(), this)
         .andThen(Commands.waitUntil(this::isAtTarget));
   }
   
-  /**
+    /**
    * Creates a command that moves the arm to position two
    * @return A command that moves the arm to position two
    */
@@ -156,7 +176,6 @@ public class ArmSubsystem extends SubsystemBase {
     return Commands.runOnce(() -> setPositionTwo(), this)
         .andThen(Commands.waitUntil(this::isAtTarget));
   }
-  
   /**
    * Creates a command that moves the arm to a specific position
    * @param position The target position in rotations
