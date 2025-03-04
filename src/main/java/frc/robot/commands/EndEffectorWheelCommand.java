@@ -39,13 +39,13 @@ public class EndEffectorWheelCommand extends Command {
         double power = m_powerSupplier.getAsDouble();
         
         // Apply the power to the wheel motor
-        m_endEffectorWheel.setWheelSpeed(power);
+        m_endEffectorWheel.setSpeed(power);
     }
 
     @Override
     public void end(boolean interrupted) {
         // Stop wheel motor when command ends
-        m_endEffectorWheel.stopWheel();
+        m_endEffectorWheel.stop();
     }
 
     @Override

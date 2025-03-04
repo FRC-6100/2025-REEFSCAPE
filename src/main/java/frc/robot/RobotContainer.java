@@ -9,21 +9,16 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.OIConstants;
-import frc.robot.commands.EndEffectorArmIncrementalCommand;
 import frc.robot.commands.EndEffectorWheelCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.EndEffectorSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -63,9 +58,9 @@ public class RobotContainer {
         // Turning is controlled by the X axis of the right stick.
         new RunCommand(
             () -> m_robotDrive.drive(
-                -MathUtil.applyDeadband(driverController.getLeftY(), OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(driverController.getLeftX(), OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(driverController.getRightX(), OIConstants.kDriveDeadband),
+                -MathUtil.applyDeadband(driverController.getLeftY(), Constants.kDriveDeadband),
+                -MathUtil.applyDeadband(driverController.getLeftX(), Constants.kDriveDeadband),
+                -MathUtil.applyDeadband(driverController.getRightX(), Constants.kDriveDeadband),
                 true),
             m_robotDrive));
   }
@@ -102,15 +97,6 @@ public class RobotContainer {
         new EndEffectorWheelCommand(
           m_endEffector,() -> 0.6)); // TODO Check the sign
 
-    // Create a single arm incremental command as the default command for the subsystem
-    m_endEffector.setDefaultCommand(
-        new EndEffectorArmIncrementalCommand(
-            m_endEffector,
-            () -> operatorController.x().getAsBoolean(), // Positive increment with X button
-            () -> operatorController.b().getAsBoolean(), // Negative increment with B button
-            ARM_INCREMENT_AMOUNT
-        )
-    );
       
   }
 
