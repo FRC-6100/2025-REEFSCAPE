@@ -9,21 +9,17 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.OIConstants;
-import frc.robot.commands.EndEffectorArmIncrementalCommand;
-import frc.robot.commands.EndEffectorWheelCommand;
+import frc.robot.commands.SetWheelPowerCommand;
+import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.EndEffectorSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -45,10 +41,10 @@ public class RobotContainer {
   private final CommandXboxController driverController = new CommandXboxController(0);
   private final CommandXboxController operatorController = new CommandXboxController(1);
 
+  // declaration to the RobotContainer class
+  private final ArmSubsystem m_arm = new ArmSubsystem();
 
- private final EndEffectorSubsystem m_endEffector = new EndEffectorSubsystem();
-
- final double ARM_INCREMENT_AMOUNT = 0.2; // Adjust this value as needed
+  private final EndEffectorSubsystem m_endEffector = new EndEffectorSubsystem();
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -63,9 +59,9 @@ public class RobotContainer {
         // Turning is controlled by the X axis of the right stick.
         new RunCommand(
             () -> m_robotDrive.drive(
-                -MathUtil.applyDeadband(driverController.getLeftY(), OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(driverController.getLeftX(), OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(driverController.getRightX(), OIConstants.kDriveDeadband),
+                -MathUtil.applyDeadband(driverController.getLeftY(), Constants.kDriveDeadband),
+                -MathUtil.applyDeadband(driverController.getLeftX(), Constants.kDriveDeadband),
+                -MathUtil.applyDeadband(driverController.getRightX(), Constants.kDriveDeadband),
                 true),
             m_robotDrive));
   }
@@ -81,37 +77,73 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
 
-    driverController.a().whileTrue(new RunCommand(() -> m_robotDrive.setX(),m_robotDrive)); // Puts drive into brake mode
+    driverController.a().whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive)); // Puts drive into brake
+                                                                                             // mode
     // driverController.b().whileTrue()); // Puts drive into field oriented mode
     // driverController.x().whileTrue()); // Puts drive into robot oriented mode
     // driverController.y().whileTrue(); // This move to pose 1
-    
+
     // driverController.start().whileTrue(); // Resets the
     // driverController.back().whileTrue(); // Resets the gyro
-    
+
     // driverController.povUp().whileTrue(); // Sets drive speed to 0.5
     // driverController.povDown().whileTrue()); // Sets drive speed to 1
     // driverController.povRight().whileTrue()); // Sets drive speed to 0.75
     // driverController.povLeft().whileTrue(); // Sets drive speed to 0.25
 
     operatorController.rightBumper().whileTrue(
-        new EndEffectorWheelCommand(
-          m_endEffector,() -> -0.6)); // TODO Check the sign
+        new SetWheelPowerCommand(
+            // Change the sign if you want to change the direction of the wheel
+            m_endEffector, () -> Constants.WHEEL_REVERSE));
 
     operatorController.leftBumper().whileTrue(
-        new EndEffectorWheelCommand(
-          m_endEffector,() -> 0.6)); // TODO Check the sign
+        new SetWheelPowerCommand(
+            // Change the sign if you want to change the direction of the wheel
+            m_endEffector, () -> Constants.WHEEL_FORWARD));
 
-    // Create a single arm incremental command as the default command for the subsystem
-    m_endEffector.setDefaultCommand(
-        new EndEffectorArmIncrementalCommand(
-            m_endEffector,
-            () -> operatorController.x().getAsBoolean(), // Positive increment with X button
-            () -> operatorController.b().getAsBoolean(), // Negative increment with B button
-            ARM_INCREMENT_AMOUNT
-        )
-    );
-      
+    // Arm position preset buttons using command factories
+    // Go to preset POSITION_ZERO variable in ArmSubsystem
+    // operatorController.x().onTrue(m_arm.positionZeroCommand());
+    // Go to preset POSITION_ONE variable in ArmSubsystem 
+    // operatorController.b().onTrue(m_arm.positionOneCommand());
+    // Go to preset POSITION_TWO variable in ArmSubsystem
+    // operatorController.y().onTrue(m_arm.positionTwoCommand());
+
+    // Test buttons for direct motor control
+    // Left trigger - move arm in positive direction at 15% power
+    // operatorController.leftTrigger().whileTrue(m_arm.testMotorCommand(0.15));
+
+    // Right trigger - move arm in negative direction at 15% power
+    // operatorController.rightTrigger().whileTrue(m_arm.testMotorCommand(-0.15));
+
+    operatorController.x().whileTrue(m_arm.setCoralArmPowerCommand(Constants.CORAL_ARM_FORWARD));
+    operatorController.b().whileTrue(m_arm.setCoralArmPowerCommand(Constants.CORAL_ARM_REVERSE));
+
+    // Option 1: Using the command factory
+    // This approach doesn't track button state transitions, it applies increments
+    // continuously while the button is held, so be careful with the increment
+    // amount
+    m_arm.setDefaultCommand(
+        m_arm.incrementalCommand(
+            // Runs an increment command when the up button is held
+            () -> operatorController.povLeft().getAsBoolean(),
+            // Runs a increment command when the down button is held
+            () -> operatorController.povRight().getAsBoolean(),
+            // TODO Small increment since this runs continuously
+            0.01 
+        ));
+
+    // Option 2 Incremental: Create a custom command that handles button transitions
+    // m_arm.setDefaultCommand(
+    // new IncrementalArmControlCommand(
+    // m_arm,
+    // () -> operatorController.povUp().getAsBoolean(),
+    // () -> operatorController.povDown().getAsBoolean(),
+    // 0.1
+    // )
+    // );
+    // }
+
   }
 
   /**

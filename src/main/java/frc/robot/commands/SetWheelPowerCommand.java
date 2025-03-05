@@ -8,7 +8,7 @@ import frc.robot.subsystems.EndEffectorSubsystem;
 /**
  * Command to control the end effector wheel with variable power
  */
-public class EndEffectorWheelCommand extends Command {
+public class SetWheelPowerCommand extends Command {
     private final EndEffectorSubsystem m_endEffectorWheel;
     private final DoubleSupplier m_powerSupplier;
     
@@ -18,7 +18,7 @@ public class EndEffectorWheelCommand extends Command {
      * @param endEffectorWheel The end effector wheel subsystem
      * @param powerSupplier Supplier that provides the power level (-1.0 to 1.0)
      */
-    public EndEffectorWheelCommand(
+    public SetWheelPowerCommand(
         EndEffectorSubsystem endEffectorWheel,
             DoubleSupplier powerSupplier) {
         
@@ -39,13 +39,13 @@ public class EndEffectorWheelCommand extends Command {
         double power = m_powerSupplier.getAsDouble();
         
         // Apply the power to the wheel motor
-        m_endEffectorWheel.setWheelSpeed(power);
+        m_endEffectorWheel.setSpeed(power);
     }
 
     @Override
     public void end(boolean interrupted) {
         // Stop wheel motor when command ends
-        m_endEffectorWheel.stopWheel();
+        m_endEffectorWheel.stop();
     }
 
     @Override
