@@ -6,8 +6,6 @@ package frc.robot.commands.CurrentlyUnused;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
-import frc.robot.subsystems.IntakeSubsystem;
-
 public class IntakeManualControl extends Command {
   private IntakeSubsystem m_intakeSubsystem;
 

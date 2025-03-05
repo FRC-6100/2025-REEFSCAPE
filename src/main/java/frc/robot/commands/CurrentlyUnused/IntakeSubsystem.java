@@ -1,7 +1,7 @@
 // Author: UMN Robotics Ri3D
 // Last Updated: January 2025
 
-package frc.robot.subsystems;
+package frc.robot.commands.CurrentlyUnused;
 
 import frc.robot.Constants;
 
@@ -28,8 +28,8 @@ public class IntakeSubsystem extends SubsystemBase {
   /** Subsystem for controlling the Intake */
   public IntakeSubsystem() {
     // Instantiate the Intake motor controllers
-    m_IntakeBar = new SparkMax(Constants.INTAKE_BAR_MOTOR_ID, MotorType.kBrushless);
-    m_IntakeArm = new SparkMax(Constants.INTAKE_ARM_MOTOR_ID, MotorType.kBrushless);
+    m_IntakeBar = new SparkMax(Constants.ALGAE_BAR_MOTOR_ID, MotorType.kBrushless);
+    m_IntakeArm = new SparkMax(Constants.ALGAE_ARM_MOTOR_ID, MotorType.kBrushless);
     
     // Configure the Spark MAX motor controllers using the new 2025 method
     configureSparkMAX(m_IntakeBar, Constants.INTAKE_BAR_INVERT);
