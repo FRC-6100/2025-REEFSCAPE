@@ -82,7 +82,16 @@ public class ArmSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Arm Position", m_encoder.getPosition());
     SmartDashboard.putNumber("Arm Target", m_targetPosition);
     SmartDashboard.putBoolean("Arm At Target", isAtTarget());
+ 
+    // Report motor status to SmartDashboard
+    SmartDashboard.putNumber("Arm Motor Position", m_encoder.getPosition());
+    SmartDashboard.putNumber("Arm Motor Velocity", m_encoder.getVelocity());
+    SmartDashboard.putNumber("Arm Motor Applied Output", m_motor.getAppliedOutput());
+    SmartDashboard.putNumber("Arm Motor Current", m_motor.getOutputCurrent());
+    // SmartDashboard.putString("Arm Motor Idle Mode", m_motor.getIdleMode().toString());
+    
   }
+
   /**
    * Set the arm to position one
    */

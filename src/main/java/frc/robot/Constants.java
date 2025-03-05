@@ -103,11 +103,15 @@ public final class Constants {
   **********************************************************/
 
   // Spark MAX CAN IDs //
-  public static final int INTAKE_BAR_MOTOR_ID = 10; 
-  public static final int INTAKE_ARM_MOTOR_ID = 12; 
-  public static final int ELEVATOR_STAGE_1_MOTOR_ID = 11;
-  public static final int ELEVATOR_STAGE_2_MOTOR_ID = 20;
+  public static final int INTAKE_BAR_MOTOR_ID = 10; // Algae arm 
+  public static final int INTAKE_ARM_MOTOR_ID = 12; // Algae arm
+  
+  public static final int ELEVATOR_STAGE_1_MOTOR_ID = 11; // Tower
+  
+  // public static final int ELEVATOR_STAGE_2_MOTOR_ID = 20; 
+
   public static final int END_EFFECTOR_WHEEL_MOTOR_ID = 13; 
+  
   public static final int END_EFFECTOR_ARM_MOTOR_ID = 9; 
 
 
