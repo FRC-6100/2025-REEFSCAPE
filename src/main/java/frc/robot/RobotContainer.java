@@ -129,21 +129,9 @@ public class RobotContainer {
             () -> operatorController.povLeft().getAsBoolean(),
             // Runs a increment command when the down button is held
             () -> operatorController.povRight().getAsBoolean(),
-            // TODO Small increment since this runs continuously
+            // Small increment since this runs continuously
             0.01 
         ));
-
-    // Option 2 Incremental: Create a custom command that handles button transitions
-    // m_arm.setDefaultCommand(
-    // new IncrementalArmControlCommand(
-    // m_arm,
-    // () -> operatorController.povUp().getAsBoolean(),
-    // () -> operatorController.povDown().getAsBoolean(),
-    // 0.1
-    // )
-    // );
-    // }
-
   }
 
   /**
