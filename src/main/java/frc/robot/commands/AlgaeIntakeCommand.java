@@ -1,0 +1,62 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package frc.robot.commands;
+
+import java.util.function.DoubleSupplier;
+
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.AlgaeSubsystem;
+
+/**
+ * A command that runs the algae intake at a given speed.
+ */
+public class AlgaeIntakeCommand extends Command {
+  private final AlgaeSubsystem m_subsystem;
+  private final DoubleSupplier m_speedSupplier;
+
+  /**
+   * Creates a new AlgaeIntakeCommand.
+   *
+   * @param subsystem The subsystem used by this command.
+   * @param speed The speed at which to run the intake. Positive values draw algae in.
+   */
+  public AlgaeIntakeCommand(AlgaeSubsystem subsystem, double speed) {
+    this(subsystem, () -> speed);
+  }
+
+  /**
+   * Creates a new AlgaeIntakeCommand with a speed supplier.
+   *
+   * @param subsystem The subsystem used by this command.
+   * @param speedSupplier The supplier of the speed at which to run the intake.
+   */
+  public AlgaeIntakeCommand(AlgaeSubsystem subsystem, DoubleSupplier speedSupplier) {
+    m_subsystem = subsystem;
+    m_speedSupplier = speedSupplier;
+    addRequirements(subsystem);
+  }
+
+  // Called when the command is initially scheduled.
+  @Override
+  public void initialize() {}
+
+  // Called every time the scheduler runs while the command is scheduled.
+  @Override
+  public void execute() {
+    m_subsystem.setAlgaeIntakeSpeed(m_speedSupplier.getAsDouble());
+  }
+
+  // Called once the command ends or is interrupted.
+  @Override
+  public void end(boolean interrupted) {
+    m_subsystem.stopAlgaeIntake();
+  }
+
+  // Returns true when the command should end.
+  @Override
+  public boolean isFinished() {
+    return false;
+  }
+}

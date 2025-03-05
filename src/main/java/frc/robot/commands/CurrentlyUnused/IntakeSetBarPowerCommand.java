@@ -1,7 +1,6 @@
 package frc.robot.commands.CurrentlyUnused;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.IntakeSubsystem;
 
 public class IntakeSetBarPowerCommand extends Command {
     private final double power;
