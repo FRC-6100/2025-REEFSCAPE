@@ -15,7 +15,7 @@ import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.commands.EndEffectorWheelCommand;
+import frc.robot.commands.SetWheelPowerCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.EndEffectorSubsystem;
@@ -92,24 +92,16 @@ public class RobotContainer {
     // driverController.povLeft().whileTrue(); // Sets drive speed to 0.25
 
     operatorController.rightBumper().whileTrue(
-        new EndEffectorWheelCommand(
+        new SetWheelPowerCommand(
             // Change the sign if you want to change the direction of the wheel
-            m_endEffector, () -> -0.6));
+            m_endEffector, () -> Constants.WHEEL_REVERSE));
 
     operatorController.leftBumper().whileTrue(
-        new EndEffectorWheelCommand(
+        new SetWheelPowerCommand(
             // Change the sign if you want to change the direction of the wheel
-            m_endEffector, () -> 0.6));
+            m_endEffector, () -> Constants.WHEEL_FORWARD));
 
     // Arm position preset buttons using command factories
-    /*
-    TODO Test and adjust the position variables in the ArmSubsystem (lines 31-33 ish)
-    Current values just for reference here.
-    POSITION_ZERO = 0.0;
-    POSITION_ONE = -20.0;
-    POSITION_TWO = -26.0;
-    */
-    
     // Go to preset POSITION_ZERO variable in ArmSubsystem
     // operatorController.x().onTrue(m_arm.positionZeroCommand());
     // Go to preset POSITION_ONE variable in ArmSubsystem 
@@ -119,14 +111,13 @@ public class RobotContainer {
 
     // Test buttons for direct motor control
     // Left trigger - move arm in positive direction at 15% power
-    operatorController.leftTrigger().whileTrue(m_arm.testMotorCommand(0.15));
+    // operatorController.leftTrigger().whileTrue(m_arm.testMotorCommand(0.15));
 
     // Right trigger - move arm in negative direction at 15% power
-    operatorController.rightTrigger().whileTrue(m_arm.testMotorCommand(-0.15));
+    // operatorController.rightTrigger().whileTrue(m_arm.testMotorCommand(-0.15));
 
-    // Alternative test buttons if you prefer using buttons instead of triggers
-    operatorController.x().whileTrue(m_arm.testMotorCommand(0.15)); // X button - positive direction
-    operatorController.b().whileTrue(m_arm.testMotorCommand(-0.15)); // B button - negative direction
+    operatorController.x().whileTrue(m_arm.setCoralArmPowerCommand(Constants.CORAL_ARM_FORWARD));
+    operatorController.b().whileTrue(m_arm.setCoralArmPowerCommand(Constants.CORAL_ARM_REVERSE));
 
     // Option 1: Using the command factory
     // This approach doesn't track button state transitions, it applies increments

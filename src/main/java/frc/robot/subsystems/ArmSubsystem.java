@@ -218,14 +218,14 @@ public class ArmSubsystem extends SubsystemBase {
     }, this);
   }
 
-    public void testMotor(double percentOutput) {
+    public void setCoralArmPower(double percentOutput) {
       m_motor.set(percentOutput);
       SmartDashboard.putString("Motor Control Mode", "Direct");
   }
 
   // Command factory for testing
-  public Command testMotorCommand(double percentOutput) {
-      return Commands.runOnce(() -> testMotor(percentOutput), this);
+  public Command setCoralArmPowerCommand(double percentOutput) {
+      return Commands.runOnce(() -> setCoralArmPower(percentOutput), this);
   }  
 
 }

@@ -8,7 +8,7 @@ import frc.robot.subsystems.EndEffectorSubsystem;
 /**
  * Command to control the end effector wheel with variable power
  */
-public class EndEffectorWheelCommand extends Command {
+public class SetWheelPowerCommand extends Command {
     private final EndEffectorSubsystem m_endEffectorWheel;
     private final DoubleSupplier m_powerSupplier;
     
@@ -18,7 +18,7 @@ public class EndEffectorWheelCommand extends Command {
      * @param endEffectorWheel The end effector wheel subsystem
      * @param powerSupplier Supplier that provides the power level (-1.0 to 1.0)
      */
-    public EndEffectorWheelCommand(
+    public SetWheelPowerCommand(
         EndEffectorSubsystem endEffectorWheel,
             DoubleSupplier powerSupplier) {
         

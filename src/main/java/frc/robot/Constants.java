@@ -111,7 +111,7 @@ public final class Constants {
   // public static final int ELEVATOR_STAGE_2_MOTOR_ID = 20; 
 
   public static final int END_EFFECTOR_WHEEL_MOTOR_ID = 13; 
-  
+
   public static final int END_EFFECTOR_ARM_MOTOR_ID = 9; 
 
 
@@ -137,7 +137,7 @@ public final class Constants {
   public static final int ELEVATOR_ROTATIONS_PER_INCH = 13; // Number of rotations elevator climb motor must complete to
                                                             // raise/lower elevator by one inch
 
-  // Intake Constants // TODO These should all be checked at some point
+  // Intake Constants
   public static final double INTAKE_LIFT_GEAR_RATIO = 3 * 7 * 7 * 48 / 29;
 
   public static final double INTAKE_ARM_MAX_POWER = 0.1;
@@ -160,8 +160,11 @@ public final class Constants {
   public static final double GRAVITY_RESISTANCE = 0.05;
 
    // Power settings for the wheel
-   public final double WHEEL_FORWARD_POWER = 0.6;  // Positive power for forward
-   public final double WHEEL_REVERSE_POWER = -0.6; // Negative power for reverse
+   public final static double WHEEL_FORWARD = 0.6;  // Positive power for forward
+   public final static double WHEEL_REVERSE = -0.6; // Negative power for reverse
+
+   public final static double CORAL_ARM_FORWARD = 0.15; // Power for the coral arm
+   public final static double CORAL_ARM_REVERSE = -0.15; // Power for the coral arm
 
   // REV PH Channels //
   // Example: public static final int EXTENSION_SOLENOID_ID = 0;
