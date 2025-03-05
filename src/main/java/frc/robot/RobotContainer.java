@@ -111,11 +111,22 @@ public class RobotContainer {
     */
     
     // Go to preset POSITION_ZERO variable in ArmSubsystem
-    operatorController.x().onTrue(m_arm.positionZeroCommand());
+    // operatorController.x().onTrue(m_arm.positionZeroCommand());
     // Go to preset POSITION_ONE variable in ArmSubsystem 
-    operatorController.b().onTrue(m_arm.positionOneCommand());
+    // operatorController.b().onTrue(m_arm.positionOneCommand());
     // Go to preset POSITION_TWO variable in ArmSubsystem
-    operatorController.y().onTrue(m_arm.positionTwoCommand());
+    // operatorController.y().onTrue(m_arm.positionTwoCommand());
+
+    // Test buttons for direct motor control
+    // Left trigger - move arm in positive direction at 15% power
+    operatorController.leftTrigger().whileTrue(m_arm.testMotorCommand(0.15));
+
+    // Right trigger - move arm in negative direction at 15% power
+    operatorController.rightTrigger().whileTrue(m_arm.testMotorCommand(-0.15));
+
+    // Alternative test buttons if you prefer using buttons instead of triggers
+    operatorController.x().whileTrue(m_arm.testMotorCommand(0.15)); // X button - positive direction
+    operatorController.b().whileTrue(m_arm.testMotorCommand(-0.15)); // B button - negative direction
 
     // Option 1: Using the command factory
     // This approach doesn't track button state transitions, it applies increments

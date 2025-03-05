@@ -50,29 +50,24 @@ public class ArmSubsystem extends SubsystemBase {
     // Initialize the motor as a Neo550
     m_motor = new SparkMax(Constants.END_EFFECTOR_ARM_MOTOR_ID, MotorType.kBrushless);
     
-    // Configure motor
-    SparkMaxConfig config = new SparkMaxConfig();
-    config.idleMode(IdleMode.kBrake);
-    config.smartCurrentLimit(20); // Appropriate for Neo550
-    
-    // Configure PID 
-    config.closedLoop.pid(kP, kI, kD);
-    // config.closedLoop.ff(kFF);
-    config.closedLoop.outputRange(MIN_OUTPUT, MAX_OUTPUT);
-    
-    // Apply configuration
-    // m_motor.applyConfig(config); // FIXME: Not yet supported in the API?!
+    // Configure motor directly
+    m_motor.setIdleMode(IdleMode.kBrake);
+    m_motor.setSmartCurrentLimit(20);
     
     // Get the encoder
     m_encoder = m_motor.getEncoder();
     
-    // Reset encoder position to zero
-    m_encoder.setPosition(0);
-    
     // Get the closed loop controller
     m_controller = m_motor.getClosedLoopController();
     
-    // Set initial position target
+    // Configure PID directly
+    m_controller.setP(kP);
+    m_controller.setI(kI);
+    m_controller.setD(kD);
+    // m_controller.setFF(kFF);  // Uncomment if you want to use feed forward
+    m_controller.setOutputRange(MIN_OUTPUT, MAX_OUTPUT);
+    
+    // Set initial position and target
     m_targetPosition = m_encoder.getPosition();
   }
   
@@ -89,7 +84,7 @@ public class ArmSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Arm Motor Applied Output", m_motor.getAppliedOutput());
     SmartDashboard.putNumber("Arm Motor Current", m_motor.getOutputCurrent());
     // SmartDashboard.putString("Arm Motor Idle Mode", m_motor.getIdleMode().toString());
-    
+
   }
 
   /**
@@ -217,15 +212,4 @@ public class ArmSubsystem extends SubsystemBase {
       }
     }, this);
   }
-
-    public void testMotor(double percentOutput) {
-      m_motor.set(percentOutput);
-      SmartDashboard.putString("Motor Control Mode", "Direct");
-  }
-
-  // Command factory for testing
-  public Command testMotorCommand(double percentOutput) {
-      return Commands.runOnce(() -> testMotor(percentOutput), this);
-  }  
-
 }
