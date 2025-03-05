@@ -142,6 +142,56 @@ public class RobotContainer {
                 m_endEffector, () -> Constants.WHEEL_REVERSE)
         );
 
+    operatorController.leftBumper().whileTrue(
+        new SetWheelPowerCommand(
+            // Change the sign if you want to change the direction of the wheel
+            m_endEffector, () -> Constants.WHEEL_FORWARD));
+
+    // Arm position preset buttons using command factories
+    // Go to preset POSITION_ZERO variable in ArmSubsystem
+    // operatorController.x().onTrue(m_arm.positionZeroCommand());
+    // Go to preset POSITION_ONE variable in ArmSubsystem 
+    // operatorController.b().onTrue(m_arm.positionOneCommand());
+    // Go to preset POSITION_TWO variable in ArmSubsystem
+    // operatorController.y().onTrue(m_arm.positionTwoCommand());
+
+    // Test buttons for direct motor control
+    // Left trigger - move arm in positive direction at 15% power
+    // operatorController.leftTrigger().whileTrue(m_arm.testMotorCommand(0.15));
+
+    // Right trigger - move arm in negative direction at 15% power
+    // operatorController.rightTrigger().whileTrue(m_arm.testMotorCommand(-0.15));
+
+    operatorController.x().whileTrue(m_arm.setCoralArmPowerCommand(Constants.CORAL_ARM_FORWARD));
+    operatorController.b().whileTrue(m_arm.setCoralArmPowerCommand(Constants.CORAL_ARM_REVERSE));
+
+    // Option 1: Using the command factory
+    // This approach doesn't track button state transitions, it applies increments
+    // continuously while the button is held, so be careful with the increment
+    // amount
+    m_arm.setDefaultCommand(
+        m_arm.incrementalCommand(
+            // Runs an increment command when the up button is held
+            () -> operatorController.povLeft().getAsBoolean(),
+            // Runs a increment command when the down button is held
+            () -> operatorController.povRight().getAsBoolean(),
+            // Small increment since this runs continuously
+            0.01 
+        ));
+  }
+
+  /**
+   * Use this to pass the autonomous command to the main {@link Robot} class.
+   *
+   * @return the command to run in autonomous
+   */
+  public Command getAutonomousCommand() {
+    // Create config for trajectory
+    TrajectoryConfig config = new TrajectoryConfig(
+        AutoConstants.kMaxSpeedMetersPerSecond,
+        AutoConstants.kMaxAccelerationMetersPerSecondSquared)
+        // Add kinematics to ensure max speed is actually obeyed
+        .setKinematics(DriveConstants.kDriveKinematics);
         operatorController.leftBumper().whileTrue(
             new SetWheelPowerCommand(
                 m_endEffector, () -> Constants.WHEEL_FORWARD)
