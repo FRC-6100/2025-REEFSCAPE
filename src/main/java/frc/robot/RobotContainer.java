@@ -27,20 +27,21 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import java.util.List;
 
-/*
- * This class is where the bulk of the robot should be declared.  Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls).  Instead, the structure of the robot
- * (including subsystems, commands, and button mappings) should be declared here.
+/**
+ * The RobotContainer class is the centralized location for robot configuration.
+ * It contains all subsystems, controllers, and button mappings.
+ * 
+ * The structure follows a command-based paradigm where robot functionality is
+ * divided into subsystems with corresponding commands.
  */
 public class RobotContainer {
-    // Subsystems
+    // -------------------- Subsystems --------------------
     private final DriveSubsystem m_robotDrive = new DriveSubsystem();
     private final ArmSubsystem m_arm = new ArmSubsystem();
     private final EndEffectorSubsystem m_endEffector = new EndEffectorSubsystem();
     private final AlgaeSubsystem m_algaeSubsystem = new AlgaeSubsystem();
 
-    // The driver's controller
+    // -------------------- Controllers --------------------
     private final CommandXboxController driverController = new CommandXboxController(0);
     private final CommandXboxController operatorController = new CommandXboxController(1);
 
@@ -48,152 +49,184 @@ public class RobotContainer {
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
     public RobotContainer() {
-        // Configure the button bindings
+        configureDefaultCommands();
         configureButtonBindings();
-
-        // Configure default commands
-        m_robotDrive.setDefaultCommand(
-                // The left stick controls translation of the robot.
-                // Turning is controlled by the X axis of the right stick.
-                new RunCommand(
-                        () -> m_robotDrive.drive(
-                                -MathUtil.applyDeadband(driverController.getLeftY(), Constants.kDriveDeadband),
-                                -MathUtil.applyDeadband(driverController.getLeftX(), Constants.kDriveDeadband),
-                                -MathUtil.applyDeadband(driverController.getRightX(), Constants.kDriveDeadband),
-                                true),
-                        m_robotDrive));
     }
 
     /**
-     * Use this method to define your button->command mappings. Buttons can be
-     * created by
-     * instantiating a {@link edu.wpi.first.wpilibj.GenericHID} or one of its
-     * subclasses ({@link
-     * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then calling
-     * passing it to a
-     * {@link JoystickButton}.
+     * Configure default commands for subsystems.
+     * These commands run when no other command is using the subsystem.
+     */
+    private void configureDefaultCommands() {
+        // Default drive command - Controlled by driver's left and right sticks
+        m_robotDrive.setDefaultCommand(
+            new RunCommand(
+                () -> m_robotDrive.drive(
+                    -MathUtil.applyDeadband(driverController.getLeftY(), Constants.kDriveDeadband),
+                    -MathUtil.applyDeadband(driverController.getLeftX(), Constants.kDriveDeadband),
+                    -MathUtil.applyDeadband(driverController.getRightX(), Constants.kDriveDeadband),
+                    true),
+                m_robotDrive)
+        );
+
+        // Default arm command - Incremental control using POV buttons
+        m_arm.setDefaultCommand(
+            m_arm.incrementalCommand(
+                () -> operatorController.povLeft().getAsBoolean(),
+                () -> operatorController.povRight().getAsBoolean(),
+                0.01) // Small increment since this runs continuously
+        );
+    }
+
+    /**
+     * Configure all button bindings for controllers.
+     * Grouped by subsystem for better organization.
      */
     private void configureButtonBindings() {
-
-        driverController.a().whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive)); // Puts drive into
-                                                                                                 // brake
-                                                                                                 // mode
-        // driverController.b().whileTrue()); // Puts drive into field oriented mode
-        // driverController.x().whileTrue()); // Puts drive into robot oriented mode
-        // driverController.y().whileTrue(); // This move to pose 1
-
-        // driverController.start().whileTrue(); // Resets the
-        // driverController.back().whileTrue(); // Resets the gyro
-
-        // driverController.povUp().whileTrue(); // Sets drive speed to 0.5
-        // driverController.povDown().whileTrue()); // Sets drive speed to 1
-        // driverController.povRight().whileTrue()); // Sets drive speed to 0.75
-        // driverController.povLeft().whileTrue(); // Sets drive speed to 0.25
-
-        operatorController.rightBumper().whileTrue(
-                new SetWheelPowerCommand(
-                        // Change the sign if you want to change the direction of the wheel
-                        m_endEffector, () -> Constants.WHEEL_REVERSE));
-
-        operatorController.leftBumper().whileTrue(
-                new SetWheelPowerCommand(
-                        // Change the sign if you want to change the direction of the wheel
-                        m_endEffector, () -> Constants.WHEEL_FORWARD));
-
-        // Arm position preset buttons using command factories
-        // Go to preset POSITION_ZERO variable in ArmSubsystem
-        // operatorController.x().onTrue(m_arm.positionZeroCommand());
-        // Go to preset POSITION_ONE variable in ArmSubsystem
-        // operatorController.b().onTrue(m_arm.positionOneCommand());
-        // Go to preset POSITION_TWO variable in ArmSubsystem
-        // operatorController.y().onTrue(m_arm.positionTwoCommand());
-
-        // Test buttons for direct motor control
-        // Left trigger - move arm in positive direction at 15% power
-        // operatorController.leftTrigger().whileTrue(m_arm.testMotorCommand(0.15));
-
-        // Right trigger - move arm in negative direction at 15% power
-        // operatorController.rightTrigger().whileTrue(m_arm.testMotorCommand(-0.15));
-
-        operatorController.x().whileTrue(m_arm.setCoralArmPowerCommand(Constants.CORAL_ARM_FORWARD));
-        operatorController.b().whileTrue(m_arm.setCoralArmPowerCommand(Constants.CORAL_ARM_REVERSE));
-
-        // Option 1: Using the command factory
-        // This approach doesn't track button state transitions, it applies increments
-        // continuously while the button is held, so be careful with the increment
-        // amount
-        m_arm.setDefaultCommand(
-                m_arm.incrementalCommand(
-                        // Runs an increment command when the up button is held
-                        () -> operatorController.povLeft().getAsBoolean(),
-                        // Runs a increment command when the down button is held
-                        () -> operatorController.povRight().getAsBoolean(),
-                        // TODO Small increment since this runs continuously
-                        0.01));
-
-        // Algae intake controls - Use left trigger for intake, right trigger for
-        // outtake
-        operatorController.leftTrigger(0.1).whileTrue(
-                m_algaeSubsystem.runAlgaeIntakeCommand(
-                        () -> operatorController.getLeftTriggerAxis() * Constants.INTAKE_BAR_SPEED));
-
-        operatorController.rightTrigger(0.1).whileTrue(
-                m_algaeSubsystem.runAlgaeIntakeCommand(
-                        () -> -operatorController.getRightTriggerAxis() * Constants.INTAKE_BAR_SPEED));
-
-        // Algae arm position controls
-        operatorController.a().onTrue(m_algaeSubsystem.positionForAlgaePickupCommand());
-        operatorController.y().onTrue(m_algaeSubsystem.positionToHoldAlgaeCommand());
-
-        // Manual algae arm control (for fine adjustments)
-        operatorController.povUp().whileTrue(m_algaeSubsystem.runAlgaeArmCommand(Constants.DEPLOY_SPEED));
-        operatorController.povDown().whileTrue(m_algaeSubsystem.runAlgaeArmCommand(-Constants.DEPLOY_SPEED));
-
+        configureDriveButtons();
+        configureArmButtons();
+        configureEndEffectorButtons();
+        configureAlgaeSubsystemButtons();
     }
 
     /**
-     * Use this to pass the autonomous command to the main {@link Robot} class.
+     * Configure drive subsystem button bindings.
+     */
+    private void configureDriveButtons() {
+        // Lock wheels in X pattern for stability
+        driverController.a().whileTrue(
+            new RunCommand(() -> m_robotDrive.setX(), m_robotDrive)
+        );
+
+        // Field-oriented mode
+        // driverController.b().whileTrue(...);
+
+        // Robot-oriented mode
+        // driverController.x().whileTrue(...);
+
+        // Move to specific pose
+        // driverController.y().whileTrue(...);
+
+        // Reset functions
+        // driverController.start().whileTrue(...);
+        // driverController.back().whileTrue(...);
+
+        // Speed control presets
+        // driverController.povUp().whileTrue(...);
+        // driverController.povDown().whileTrue(...);
+        // driverController.povRight().whileTrue(...);
+        // driverController.povLeft().whileTrue(...);
+    }
+
+    /**
+     * Configure arm subsystem button bindings.
+     */
+    private void configureArmButtons() {
+        // Coral arm manual control
+        operatorController.a().whileTrue(
+            m_arm.setCoralArmPowerCommand(Constants.CORAL_ARM_FORWARD)
+        );
+        
+        operatorController.b().whileTrue(
+            m_arm.setCoralArmPowerCommand(Constants.CORAL_ARM_REVERSE)
+        );
+    }
+
+    /**
+     * Configure end effector subsystem button bindings.
+     */
+    private void configureEndEffectorButtons() {
+        // End effector wheel control
+        operatorController.rightBumper().whileTrue(
+            new SetWheelPowerCommand(
+                m_endEffector, () -> Constants.WHEEL_REVERSE)
+        );
+
+        operatorController.leftBumper().whileTrue(
+            new SetWheelPowerCommand(
+                m_endEffector, () -> Constants.WHEEL_FORWARD)
+        );
+    }
+
+    /**
+     * Configure algae subsystem button bindings.
+     */
+    private void configureAlgaeSubsystemButtons() {
+        // Algae intake control - proportional to trigger pressure
+        operatorController.leftTrigger(0.1).whileTrue(
+            m_algaeSubsystem.runAlgaeIntakeCommand(
+                () -> operatorController.getLeftTriggerAxis() * Constants.INTAKE_BAR_SPEED)
+        );
+
+        operatorController.rightTrigger(0.1).whileTrue(
+            m_algaeSubsystem.runAlgaeIntakeCommand(
+                () -> -operatorController.getRightTriggerAxis() * Constants.INTAKE_BAR_SPEED)
+        );
+
+        // Algae arm position presets
+        operatorController.x().onTrue(
+            m_algaeSubsystem.positionForAlgaePickupCommand()
+        );
+        
+        operatorController.y().onTrue(
+            m_algaeSubsystem.positionToHoldAlgaeCommand()
+        );
+
+        // Manual algae arm adjustment
+        operatorController.povUp().whileTrue(
+            m_algaeSubsystem.runAlgaeArmCommand(Constants.DEPLOY_SPEED)
+        );
+        
+        operatorController.povDown().whileTrue(
+            m_algaeSubsystem.runAlgaeArmCommand(-Constants.DEPLOY_SPEED)
+        );
+    }
+
+    /**
+     * Creates and returns the autonomous command.
      *
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        // Create config for trajectory
+        // Create trajectory configuration
         TrajectoryConfig config = new TrajectoryConfig(
-                AutoConstants.kMaxSpeedMetersPerSecond,
-                AutoConstants.kMaxAccelerationMetersPerSecondSquared)
-                // Add kinematics to ensure max speed is actually obeyed
-                .setKinematics(DriveConstants.kDriveKinematics);
+            AutoConstants.kMaxSpeedMetersPerSecond,
+            AutoConstants.kMaxAccelerationMetersPerSecondSquared
+        ).setKinematics(DriveConstants.kDriveKinematics);
 
-        // An example trajectory to follow. All units in meters.
-        Trajectory driveForwardTrajectory = TrajectoryGenerator.generateTrajectory(
-                // Start at the origin facing the +X direction
-                new Pose2d(0, 0, new Rotation2d(0)),
-                // Pass through these two interior waypoints, making an 's' curve path
-                List.of(),
-                // End 3 meters straight ahead of where we started, facing forward
-                new Pose2d(3, 0, new Rotation2d(0)),
-                config);
+        // Create a simple forward trajectory
+        Trajectory trajectory = TrajectoryGenerator.generateTrajectory(
+            new Pose2d(0, 0, new Rotation2d(0)),
+            List.of(),
+            new Pose2d(3, 0, new Rotation2d(0)),
+            config
+        );
 
+        // Create PID controllers for trajectory following
+        var xController = new PIDController(AutoConstants.kPXController, 0, 0);
+        var yController = new PIDController(AutoConstants.kPYController, 0, 0);
         var thetaController = new ProfiledPIDController(
-                AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
+            AutoConstants.kPThetaController, 0, 0, 
+            AutoConstants.kThetaControllerConstraints
+        );
         thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
+        // Create the swerve controller command
         SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
-                driveForwardTrajectory,
-                m_robotDrive::getPose, // Functional interface to feed supplier
-                DriveConstants.kDriveKinematics,
+            trajectory,
+            m_robotDrive::getPose,
+            DriveConstants.kDriveKinematics,
+            xController,
+            yController,
+            thetaController,
+            m_robotDrive::setModuleStates,
+            m_robotDrive
+        );
 
-                // Position controllers
-                new PIDController(AutoConstants.kPXController, 0, 0),
-                new PIDController(AutoConstants.kPYController, 0, 0),
-                thetaController,
-                m_robotDrive::setModuleStates,
-                m_robotDrive);
+        // Reset odometry to trajectory starting position
+        m_robotDrive.resetOdometry(trajectory.getInitialPose());
 
-        // Reset odometry to the starting pose of the trajectory.
-        m_robotDrive.resetOdometry(driveForwardTrajectory.getInitialPose());
-
-        // Run path following command, then stop at the end.
+        // Return the complete autonomous command
         return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false));
     }
 }
