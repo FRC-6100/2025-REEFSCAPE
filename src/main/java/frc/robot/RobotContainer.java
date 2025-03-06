@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.commands.SetWheelPowerCommand;
-// import frc.robot.subsystems.AlgaeSubsystem;
+import frc.robot.subsystems.AlgaeSubsystem;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.EndEffectorSubsystem;
@@ -39,7 +39,7 @@ public class RobotContainer {
     private final DriveSubsystem m_robotDrive = new DriveSubsystem();
     private final ArmSubsystem m_arm = new ArmSubsystem();
     private final EndEffectorSubsystem m_endEffector = new EndEffectorSubsystem();
-    // private final AlgaeSubsystem m_algaeSubsystem = new AlgaeSubsystem();
+    private final AlgaeSubsystem m_algaeSubsystem = new AlgaeSubsystem();
 
     // -------------------- Controllers --------------------
     private final CommandXboxController driverController = new CommandXboxController(0);
@@ -86,7 +86,7 @@ public class RobotContainer {
         configureDriveButtons();
         configureArmButtons();
         configureEndEffectorButtons();
-        // configureAlgaeSubsystemButtons();
+        configureAlgaeSubsystemButtons();
     }
 
     /**
@@ -151,7 +151,6 @@ public class RobotContainer {
     /**
      * Configure algae subsystem button bindings.
      */
-    /*
     private void configureAlgaeSubsystemButtons() {
         // Algae intake control - proportional to trigger pressure
         operatorController.leftTrigger(0.1).whileTrue(
@@ -182,7 +181,6 @@ public class RobotContainer {
             m_algaeSubsystem.runAlgaeArmCommand(-Constants.DEPLOY_SPEED)
         );
     }
- */
 
     /**
      * Creates and returns the autonomous command.
@@ -200,7 +198,7 @@ public class RobotContainer {
         Trajectory trajectory = TrajectoryGenerator.generateTrajectory(
             new Pose2d(0, 0, new Rotation2d(0)),
             List.of(),
-            new Pose2d(3, 0, new Rotation2d(0)),
+            new Pose2d(1.2, 0, new Rotation2d(0)),
             config
         );
 

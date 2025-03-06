@@ -1,0 +1,62 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package frc.robot.commands;
+
+import java.util.function.DoubleSupplier;
+
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.AlgaeSubsystem;
+
+/**
+ * A command that runs the algae arm at a given speed.
+ */
+public class AlgaeArmCommand extends Command {
+  private final AlgaeSubsystem m_subsystem;
+  private final DoubleSupplier m_speedSupplier;
+
+  /**
+   * Creates a new AlgaeArmCommand.
+   *
+   * @param subsystem The subsystem used by this command.
+   * @param speed The speed at which to run the arm.
+   */
+  public AlgaeArmCommand(AlgaeSubsystem subsystem, double speed) {
+    this(subsystem, () -> speed);
+  }
+
+  /**
+   * Creates a new AlgaeArmCommand with a speed supplier.
+   *
+   * @param subsystem The subsystem used by this command.
+   * @param speedSupplier The supplier of the speed at which to run the arm.
+   */
+  public AlgaeArmCommand(AlgaeSubsystem subsystem, DoubleSupplier speedSupplier) {
+    m_subsystem = subsystem;
+    m_speedSupplier = speedSupplier;
+    addRequirements(subsystem);
+  }
+
+  // Called when the command is initially scheduled.
+  @Override
+  public void initialize() {}
+
+  // Called every time the scheduler runs while the command is scheduled.
+  @Override
+  public void execute() {
+    m_subsystem.setAlgaeArmSpeed(m_speedSupplier.getAsDouble());
+  }
+
+  // Called once the command ends or is interrupted.
+  @Override
+  public void end(boolean interrupted) {
+    m_subsystem.stopAlgaeArm();
+  }
+
+  // Returns true when the command should end.
+  @Override
+  public boolean isFinished() {
+    return false;
+  }
+}
