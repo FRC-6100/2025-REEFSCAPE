@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+// Adjustments https://claude.ai/chat/88b0a163-212b-4705-b8b1-de86de6d477c
+
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -20,6 +22,9 @@ public class ArmSubsystem extends SubsystemBase {
   private final SparkMax m_motor;
   private final RelativeEncoder m_encoder;
   private final SparkClosedLoopController m_controller;
+
+  private static final double kFF = 0.15; // Increase feed forward to counteract gravity
+
 
   // The preset positions (in rotations)
   /*
