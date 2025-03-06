@@ -13,14 +13,19 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.commands.SetWheelPowerCommand;
+import frc.robot.commands.AutonCommands;
+import frc.robot.commands.AutonDriveForwardCommand;
+import frc.robot.commands.SetWheelSpeedCommand;
 import frc.robot.subsystems.AlgaeSubsystem;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.EndEffectorSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -45,12 +50,16 @@ public class RobotContainer {
     private final CommandXboxController driverController = new CommandXboxController(0);
     private final CommandXboxController operatorController = new CommandXboxController(1);
 
+    // Needed for an auton chooser
+    private final SendableChooser<Command> m_autoChooser = new SendableChooser<>();
+
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
-     */
+     */    
     public RobotContainer() {
         configureDefaultCommands();
         configureButtonBindings();
+        configureAutonOptions();
     }
 
     /**
@@ -138,12 +147,12 @@ public class RobotContainer {
     private void configureEndEffectorButtons() {
         // End effector wheel control
         operatorController.rightBumper().whileTrue(
-            new SetWheelPowerCommand(
+            new SetWheelSpeedCommand(
                 m_endEffector, () -> Constants.WHEEL_REVERSE)
         );
 
         operatorController.leftBumper().whileTrue(
-            new SetWheelPowerCommand(
+            new SetWheelSpeedCommand(
                 m_endEffector, () -> Constants.WHEEL_FORWARD)
         );
     }
@@ -182,11 +191,31 @@ public class RobotContainer {
         );
     }
 
+private void configureAutonOptions() {
+        // Add options to the chooser
+        m_autoChooser.setDefaultOption("Drive Forward",
+             AutonCommands.driveForward(m_robotDrive));
+        m_autoChooser.addOption("Score and Drive", 
+            AutonCommands.scoreAndDrive(m_robotDrive, m_arm, m_endEffector));
+        m_autoChooser.addOption("Do Nothing", 
+            Commands.none());
+        
+        // Put the chooser on the dashboard
+        SmartDashboard.putData("Auto Selector", m_autoChooser);
+    }
+
+
+
     /**
      * Creates and returns the autonomous command.
      *
      * @return the command to run in autonomous
      */
+    public Command getAutonomousCommand() {
+        // Return the selected autonomous command from the chooser
+        return m_autoChooser.getSelected();
+    }
+    /* --> Moved to AutonDriveForwardCommand.java
     public Command getAutonomousCommand() {
         // Create trajectory configuration
         TrajectoryConfig config = new TrajectoryConfig(
@@ -228,5 +257,6 @@ public class RobotContainer {
 
         // Return the complete autonomous command
         return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false));
-    }
+    } */
+
 }

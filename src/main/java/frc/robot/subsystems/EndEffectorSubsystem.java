@@ -37,7 +37,7 @@ public class EndEffectorSubsystem extends SubsystemBase {
      * Sets speed of the end effector wheel motor
      * @param speed The speed to set (-1.0 to 1.0)
      */
-    public void setSpeed(double speed) {
+    public void setWheelSpeed(double speed) {
         m_end_effector_wheel.set(speed);
     }
     
@@ -53,7 +53,7 @@ public class EndEffectorSubsystem extends SubsystemBase {
      * Sets speed of wheel motor to 0
      */
     public void stop() {
-        setSpeed(0);
+        setWheelSpeed(0);
     }
     
     @Override
