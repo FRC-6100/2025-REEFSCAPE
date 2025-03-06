@@ -117,7 +117,7 @@ public final class Constants {
 
 
   // PWM Ports //
-  public static final int LED_PWM_ID = 4; // TODO
+  public static final int LED_PWM_ID = 4;
 
   // DIO (Digital Input/Output) Channels //
   // Example: public static final int RIGHT_ENCODER_CHANNEL_A = 0;
@@ -126,7 +126,7 @@ public final class Constants {
   // Example: public static final int LEFT_ENCODER_CHANNEL_B = 3;
 
 
-  // Coral Elevator Constants // TODO These should all be checked at some point BUT probably not needed
+  // Coral Elevator Constants
   public static final boolean ELEVATOR_STAGE_1_INVERT = true; 
   public static final boolean ELEVATOR_STAGE_2_INVERT = true;
   public static final boolean ELEVATOR_WHEEL_INVERT = true;
