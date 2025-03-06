@@ -173,21 +173,24 @@ public class RobotContainer {
         );
 
         // Algae arm position presets
-        operatorController.x().onTrue(
-            m_algaeSubsystem.positionForAlgaePickupCommand()
+        /* operatorController.x().onTrue(
+            m_algaeSubsystem.runAlgaeArmCommand(Constants.ALGAE_ARM_UP)
         );
+        */
         
+        /*
         operatorController.y().onTrue(
-            m_algaeSubsystem.positionToHoldAlgaeCommand()
+            m_algaeSubsystem.runAlgaeArmCommand(Constants.ALGAE_ARM_DOWN)
         );
+        */
 
         // Manual algae arm adjustment
         operatorController.povUp().whileTrue(
-            m_algaeSubsystem.runAlgaeArmCommand(Constants.DEPLOY_SPEED)
+            m_algaeSubsystem.runAlgaeArmCommand(Constants.ALGAE_ARM_UP)
         );
         
         operatorController.povDown().whileTrue(
-            m_algaeSubsystem.runAlgaeArmCommand(-Constants.DEPLOY_SPEED)
+            m_algaeSubsystem.runAlgaeArmCommand(-Constants.ALGAE_ARM_DOWN)
         );
     }
 

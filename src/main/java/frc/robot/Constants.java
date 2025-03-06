@@ -134,7 +134,7 @@ public final class Constants {
   public static final double ELEVATOR_SPEED = 0.2;
   public static final double ARM_SPEED = 0.2;
   public static final double WHEEL_SPEED = 0.6;
-  public static final double ARM_GRAVITY_CONST = -0.03;
+  public static final double ARM_GRAVITY_CONST = -0.03; 
   public static final int ELEVATOR_ROTATIONS_PER_INCH = 13; // Number of rotations elevator climb motor must complete to
                                                             // raise/lower elevator by one inch
 
@@ -149,7 +149,10 @@ public final class Constants {
   public static final double INTAKE_RETURN_LIMIT = 0;
 
   public static final boolean INTAKE_ARM_INVERT = true;
-  public static final double DEPLOY_SPEED = 0.1;
+  
+  public static final double ALGAE_ARM_UP = 0.2; // Increase from 0.1
+  public static final double ALGAE_ARM_DOWN = -0.2; // Increase from 0.1
+
   public static final boolean INTAKE_BAR_INVERT = false;
   public static final double INTAKE_BAR_SPEED = 0.8;
 
@@ -158,7 +161,7 @@ public final class Constants {
   public static final double PICK_UP_CORAL_POSITION = 53;
   public static final double HOLD_CORAL_POSITION = 24;
 
-  public static final double GRAVITY_RESISTANCE = 0.05;
+  public static final double GRAVITY_RESISTANCE = 0.05; // TODO Adjust for gravity if needed
 
    // Power settings for the wheel
    public final static double WHEEL_FORWARD = 0.6;  // Positive power for forward
