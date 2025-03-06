@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.commands.AutonCommands;
-import frc.robot.commands.AutonDriveForwardCommand;
 import frc.robot.commands.SetWheelSpeedCommand;
 import frc.robot.subsystems.AlgaeSubsystem;
 import frc.robot.subsystems.ArmSubsystem;
@@ -27,10 +26,7 @@ import frc.robot.subsystems.EndEffectorSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import java.util.List;
 
 /**
  * The RobotContainer class is the centralized location for robot configuration.

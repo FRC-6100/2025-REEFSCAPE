@@ -84,6 +84,12 @@ public class ArmSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+
+    // TODO Test this gravity compensation
+    double gravityCompensation = Math.cos(Math.toRadians(getCurrentPosition() * 360 / 50)) * 0.1;
+
+
+
     // Publish current position and target to SmartDashboard
     SmartDashboard.putNumber("Arm Position", m_encoder.getPosition());
     SmartDashboard.putNumber("Arm Target", m_targetPosition);
@@ -160,6 +166,13 @@ public class ArmSubsystem extends SubsystemBase {
   
   public void setCoralArmPower(double percentOutput) {
     m_motor.set(percentOutput);
+
+    // Added to help with gravity compensation
+    double position = getCurrentPosition();
+    double gravityComp = Math.cos(Math.toRadians(position * 360 / 50)) * 0.1;
+    m_motor.set(percentOutput + gravityComp);
+    //
+
   }
 
   /**

@@ -71,8 +71,17 @@ public class AlgaeSubsystem extends SubsystemBase {
    * @param percentOutput The percent output to set (-1.0 to 1.0)
    */
   public void setAlgaeArmSpeed(double percentOutput) {
+    // TODO Added
+    double position = getAlgaeArmPosition();
+    double gravityComp = 0.05 + Math.abs(Math.sin(position * Math.PI / 50) * 0.05);
+    
     // Apply gravity compensation constant to help maintain position
-    algaeArmMotor.set(percentOutput + Constants.GRAVITY_RESISTANCE);
+    // algaeArmMotor.set(percentOutput + Constants.GRAVITY_RESISTANCE); // previous
+    // TODO Added
+    algaeArmMotor.set(percentOutput + gravityComp);
+
+
+
   }
 
   /**
