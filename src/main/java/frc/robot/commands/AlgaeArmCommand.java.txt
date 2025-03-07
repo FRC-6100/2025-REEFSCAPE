@@ -7,32 +7,32 @@ package frc.robot.commands;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.AlgaeSubsystem;
+import frc.robot.subsystems.AlgaeArmSubsystem;
 
 /**
- * A command that runs the algae intake at a given speed.
+ * A command that runs the algae arm at a given speed.
  */
-public class AlgaeIntakeCommand extends Command {
-  private final AlgaeSubsystem m_subsystem;
+public class AlgaeArmCommand extends Command {
+  private final AlgaeArmSubsystem m_subsystem;
   private final DoubleSupplier m_speedSupplier;
 
   /**
-   * Creates a new AlgaeIntakeCommand.
+   * Creates a new AlgaeArmCommand.
    *
    * @param subsystem The subsystem used by this command.
-   * @param speed The speed at which to run the intake. Positive values draw algae in.
+   * @param speed The speed at which to run the arm.
    */
-  public AlgaeIntakeCommand(AlgaeSubsystem subsystem, double speed) {
+  public AlgaeArmCommand(AlgaeArmSubsystem subsystem, double speed) {
     this(subsystem, () -> speed);
   }
 
   /**
-   * Creates a new AlgaeIntakeCommand with a speed supplier.
+   * Creates a new AlgaeArmCommand with a speed supplier.
    *
    * @param subsystem The subsystem used by this command.
-   * @param speedSupplier The supplier of the speed at which to run the intake.
+   * @param speedSupplier The supplier of the speed at which to run the arm.
    */
-  public AlgaeIntakeCommand(AlgaeSubsystem subsystem, DoubleSupplier speedSupplier) {
+  public AlgaeArmCommand(AlgaeArmSubsystem subsystem, DoubleSupplier speedSupplier) {
     m_subsystem = subsystem;
     m_speedSupplier = speedSupplier;
     addRequirements(subsystem);
@@ -45,13 +45,13 @@ public class AlgaeIntakeCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_subsystem.setAlgaeIntakeSpeed(m_speedSupplier.getAsDouble());
+    m_subsystem.setAlgaeArmSpeed(m_speedSupplier.getAsDouble());
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_subsystem.stopAlgaeIntake();
+    m_subsystem.stopAlgaeArm();
   }
 
   // Returns true when the command should end.

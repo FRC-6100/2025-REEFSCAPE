@@ -1,17 +1,7 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.subsystems;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -20,50 +10,26 @@ import frc.robot.Constants;
 
 import java.util.function.DoubleSupplier;
 
-@SuppressWarnings("unused")
-
-public class AlgaeSubsystem extends SubsystemBase {
-  // Create the motor controllers
-  private final SparkMax algaeIntakeMotor;
+public class AlgaeArmSubsystem extends SubsystemBase {
+  // Create the motor controller
   private final SparkMax algaeArmMotor;
-
-  // Create encoders for position tracking
+  
+  // Create encoder for position tracking
   private final RelativeEncoder algaeArmEncoder;
 
   /**
-   * Creates a new AlgaeSubsystem.
+   * Creates a new AlgaeArmSubsystem.
    */
-  public AlgaeSubsystem() {
-    // Initialize the intake bar motor (NEO 550)
-    algaeIntakeMotor = new SparkMax(Constants.ALGAE_BAR_MOTOR_ID, MotorType.kBrushless);
-    // algaeIntakeMotor.restoreFactoryDefaults();
-    algaeIntakeMotor.setInverted(Constants.INTAKE_BAR_INVERT);
-    // algaeIntakeMotor.setSmartCurrentLimit(20); // Limiting current to protect the NEO 550
-    
+  public AlgaeArmSubsystem() {
     // Initialize the arm motor (NEO 550)
     algaeArmMotor = new SparkMax(Constants.ALGAE_ARM_MOTOR_ID, MotorType.kBrushless);
-    // algaeArmMotor.restoreFactoryDefaults();
     algaeArmMotor.setInverted(Constants.INTAKE_ARM_INVERT);
-    // algaeArmMotor.setSmartCurrentLimit(20); // Limiting current to protect the NEO 550
     
     // Get the encoder for the arm motor for position control
     algaeArmEncoder = algaeArmMotor.getEncoder();
     
     // Reset the arm encoder position to 0
     algaeArmEncoder.setPosition(0);
-    
-    // Apply configuration
-    // algaeIntakeMotor.burnFlash();
-    // algaeArmMotor.burnFlash();
-  }
-
-  /**
-   * Sets the percent output to the algae intake motor.
-   * 
-   * @param percentOutput The percent output to set (-1.0 to 1.0)
-   */
-  public void setAlgaeIntakeSpeed(double percentOutput) {
-    algaeIntakeMotor.set(percentOutput);
   }
 
   /**
@@ -87,48 +53,10 @@ public class AlgaeSubsystem extends SubsystemBase {
   }
 
   /**
-   * Stops the algae intake motor.
-   */
-  public void stopAlgaeIntake() {
-    algaeIntakeMotor.set(0);
-  }
-
-  /**
    * Stops the algae arm motor.
    */
   public void stopAlgaeArm() {
     algaeArmMotor.set(0);
-  }
-
-  /**
-   * Stops all motors in the subsystem.
-   */
-  public void stopAll() {
-    stopAlgaeIntake();
-    stopAlgaeArm();
-  }
-
-  /**
-   * Creates a command that runs the algae intake at a fixed speed.
-   * 
-   * @param speed The speed to run the intake at (-1.0 to 1.0)
-   * @return A command that will run the algae intake
-   */
-  public Command runAlgaeIntakeCommand(double speed) {
-    return this.runOnce(() -> setAlgaeIntakeSpeed(speed))
-              .andThen(this.run(() -> setAlgaeIntakeSpeed(speed)))
-              .finallyDo(interrupted -> stopAlgaeIntake());
-  }
-
-  /**
-   * Creates a command that runs the algae intake with a speed supplier.
-   * 
-   * @param speedSupplier A supplier for the speed (-1.0 to 1.0)
-   * @return A command that will run the algae intake
-   */
-  public Command runAlgaeIntakeCommand(DoubleSupplier speedSupplier) {
-    return this.run(() -> setAlgaeIntakeSpeed(speedSupplier.getAsDouble()))
-              .finallyDo(interrupted -> stopAlgaeIntake());
   }
 
   /**
@@ -183,7 +111,7 @@ public class AlgaeSubsystem extends SubsystemBase {
    * 
    * @return A command that will deploy the algae intake
    */
-  public Command deployAlgaeIntakeCommand() {
+  public Command deployAlgaeArmCommand() {
     return moveArmToPositionCommand(Constants.INTAKE_DEPLOY_LIMIT);
   }
 
@@ -192,7 +120,7 @@ public class AlgaeSubsystem extends SubsystemBase {
    * 
    * @return A command that will stow the algae intake
    */
-  public Command stowAlgaeIntakeCommand() {
+  public Command stowAlgaeArmCommand() {
     return moveArmToPositionCommand(Constants.INTAKE_RETURN_LIMIT);
   }
 
