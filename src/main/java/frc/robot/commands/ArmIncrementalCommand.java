@@ -3,13 +3,13 @@ package frc.robot.commands;
 import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.CoralArmSubsystem;
 
 /**
  * Command to incrementally adjust the arm position
  */
 public class ArmIncrementalCommand extends Command {
-  private final ArmSubsystem m_subsystem;
+  private final CoralArmSubsystem m_subsystem;
   private final BooleanSupplier m_incrementUp;
   private final BooleanSupplier m_incrementDown;
   private final double m_incrementAmount;
@@ -26,7 +26,7 @@ public class ArmIncrementalCommand extends Command {
    * @param incrementAmount The amount to increment by each time (rotations)
    */
   public ArmIncrementalCommand(
-      ArmSubsystem subsystem, 
+      CoralArmSubsystem subsystem, 
       BooleanSupplier incrementUp,
       BooleanSupplier incrementDown,
       double incrementAmount) {

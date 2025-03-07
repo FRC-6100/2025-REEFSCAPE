@@ -13,7 +13,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class EndEffectorSubsystem extends SubsystemBase {
+public class CoralEffectorSubsystem extends SubsystemBase {
 
    
 
@@ -21,7 +21,7 @@ public class EndEffectorSubsystem extends SubsystemBase {
     private SparkMax m_end_effector_wheel; // NEO motor
     
     /** Subsystem for controlling the end effector wheel */
-    public EndEffectorSubsystem() {
+    public CoralEffectorSubsystem() {
         // Configure the Spark MAX motor controller
         m_end_effector_wheel = new SparkMax(Constants.END_EFFECTOR_WHEEL_MOTOR_ID, MotorType.kBrushless);
         configureSparkMAX(m_end_effector_wheel, Constants.ELEVATOR_WHEEL_INVERT);
