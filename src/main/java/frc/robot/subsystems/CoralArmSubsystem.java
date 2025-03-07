@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-public class ArmSubsystem extends SubsystemBase {
+public class CoralArmSubsystem extends SubsystemBase {
   private final SparkMax m_motor;
   private final RelativeEncoder m_encoder;
   private final SparkClosedLoopController m_controller;
@@ -47,7 +47,7 @@ public class ArmSubsystem extends SubsystemBase {
   private static final double MIN_OUTPUT = -0.4; // Limits max speed in reverse
   private static final double POSITION_TOLERANCE = 0.1; // Rotations tolerance
 
-  public ArmSubsystem() {
+  public CoralArmSubsystem() {
     // Initialize the motor as a Neo550
     m_motor = new SparkMax(Constants.END_EFFECTOR_ARM_MOTOR_ID, MotorType.kBrushless);
 

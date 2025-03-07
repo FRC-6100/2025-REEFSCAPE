@@ -5,32 +5,18 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants.AutoConstants;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.commands.AutonCommands;
-import frc.robot.commands.AutonDriveForwardCommand;
 import frc.robot.commands.SetWheelSpeedCommand;
 import frc.robot.subsystems.AlgaeSubsystem;
-import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.CoralArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.EndEffectorSubsystem;
+import frc.robot.subsystems.CoralEffectorSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import java.util.List;
 
 /**
  * The RobotContainer class is the centralized location for robot configuration.
@@ -42,8 +28,8 @@ import java.util.List;
 public class RobotContainer {
     // -------------------- Subsystems --------------------
     private final DriveSubsystem m_robotDrive = new DriveSubsystem();
-    private final ArmSubsystem m_arm = new ArmSubsystem();
-    private final EndEffectorSubsystem m_endEffector = new EndEffectorSubsystem();
+    private final CoralArmSubsystem m_arm = new CoralArmSubsystem();
+    private final CoralEffectorSubsystem m_endEffector = new CoralEffectorSubsystem();
     private final AlgaeSubsystem m_algaeSubsystem = new AlgaeSubsystem();
 
     // -------------------- Controllers --------------------

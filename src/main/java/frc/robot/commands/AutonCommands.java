@@ -17,9 +17,9 @@ import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import frc.robot.Constants;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.CoralArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.EndEffectorSubsystem;
+import frc.robot.subsystems.CoralEffectorSubsystem;
 
 import java.util.List;
 
@@ -100,8 +100,8 @@ public final class AutonCommands {
      ********************************************************************/
     public static Command scoreAndDrive(
             DriveSubsystem driveSubsystem,
-            ArmSubsystem armSubsystem,
-            EndEffectorSubsystem endEffectorSubsystem) {
+            CoralArmSubsystem armSubsystem,
+            CoralEffectorSubsystem endEffectorSubsystem) {
         
         return Commands.sequence(
             // First drive forward
@@ -145,8 +145,8 @@ public final class AutonCommands {
      */
     public static Command customRoutine(
             DriveSubsystem driveSubsystem,
-            ArmSubsystem armSubsystem,
-            EndEffectorSubsystem endEffectorSubsystem,
+            CoralArmSubsystem armSubsystem,
+            CoralEffectorSubsystem endEffectorSubsystem,
             double driveDistance,
             double armTime,
             double wheelTime) {

@@ -1,13 +1,13 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.CoralArmSubsystem;
 
 /**
  * Command to move the arm to a preset position
  */
 public class ArmPositionCommand extends Command {
-  private final ArmSubsystem m_subsystem;
+  private final CoralArmSubsystem m_subsystem;
   private final boolean m_isPositionOne;
 
   /**
@@ -16,7 +16,7 @@ public class ArmPositionCommand extends Command {
    * @param subsystem The subsystem used by this command.
    * @param isPositionOne Whether to move to position one (true) or position two (false)
    */
-  public ArmPositionCommand(ArmSubsystem subsystem, boolean isPositionOne) {
+  public ArmPositionCommand(CoralArmSubsystem subsystem, boolean isPositionOne) {
     m_subsystem = subsystem;
     m_isPositionOne = isPositionOne;
     
