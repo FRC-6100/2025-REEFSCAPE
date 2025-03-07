@@ -79,9 +79,7 @@ public class RobotContainer {
      */
     private void configureButtonBindings() {
         configureDriveButtons();
-        configureArmButtons();
-        configureEndEffectorButtons();
-        configureAlgaeSubsystemButtons();
+        configureOperatorButtons();
     }
 
     /**
@@ -116,7 +114,29 @@ public class RobotContainer {
     /**
      * Configure arm subsystem button bindings.
      */
-    private void configureArmButtons() {
+    private void configureOperatorButtons() {
+        // Coral effector wheel control
+        operatorController.rightBumper().whileTrue(
+            new SetWheelSpeedCommand(
+                m_endEffector, () -> Constants.CORAL_WHEEL_REVERSE)
+        );
+
+        operatorController.leftBumper().whileTrue(
+            new SetWheelSpeedCommand(
+                m_endEffector, () -> Constants.CORAL_WHEEL_FORWARD)
+        );
+ 
+        // Algae intake control - proportional to trigger pressure
+        operatorController.leftTrigger(0.1).whileTrue(
+            m_algaeSubsystem.runAlgaeIntakeCommand(
+                () -> operatorController.getLeftTriggerAxis() * Constants.ALGAE_BAR_SPEED)
+        );
+
+        operatorController.rightTrigger(0.1).whileTrue(
+            m_algaeSubsystem.runAlgaeIntakeCommand(
+                () -> -operatorController.getRightTriggerAxis() * Constants.ALGAE_BAR_SPEED)
+        );
+
         // Coral arm manual control
         operatorController.a().whileTrue(
             m_arm.setCoralArmPowerCommand(Constants.CORAL_ARM_FORWARD)
@@ -125,39 +145,7 @@ public class RobotContainer {
         operatorController.b().whileTrue(
             m_arm.setCoralArmPowerCommand(Constants.CORAL_ARM_REVERSE)
         );
-    }
-
-    /**
-     * Configure end effector subsystem button bindings.
-     */
-    private void configureEndEffectorButtons() {
-        // End effector wheel control
-        operatorController.rightBumper().whileTrue(
-            new SetWheelSpeedCommand(
-                m_endEffector, () -> Constants.WHEEL_REVERSE)
-        );
-
-        operatorController.leftBumper().whileTrue(
-            new SetWheelSpeedCommand(
-                m_endEffector, () -> Constants.WHEEL_FORWARD)
-        );
-    }
-
-    /**
-     * Configure algae subsystem button bindings.
-     */
-    private void configureAlgaeSubsystemButtons() {
-        // Algae intake control - proportional to trigger pressure
-        operatorController.leftTrigger(0.1).whileTrue(
-            m_algaeSubsystem.runAlgaeIntakeCommand(
-                () -> operatorController.getLeftTriggerAxis() * Constants.INTAKE_BAR_SPEED)
-        );
-
-        operatorController.rightTrigger(0.1).whileTrue(
-            m_algaeSubsystem.runAlgaeIntakeCommand(
-                () -> -operatorController.getRightTriggerAxis() * Constants.INTAKE_BAR_SPEED)
-        );
-
+        
         // Algae arm position presets
         /* operatorController.x().onTrue(
             m_algaeSubsystem.runAlgaeArmCommand(Constants.ALGAE_ARM_UP)
@@ -170,7 +158,6 @@ public class RobotContainer {
         );
         */
 
-        // Manual algae arm adjustment
         operatorController.povUp().whileTrue(
             m_algaeSubsystem.runAlgaeArmCommand(Constants.ALGAE_ARM_UP)
         );

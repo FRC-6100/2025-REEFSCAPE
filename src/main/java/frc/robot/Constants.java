@@ -98,25 +98,18 @@ public final class Constants {
     public static final double kFreeSpeedRpm = 5676;
   }
 
-  /********************************************************************* 
-   * This and below is from Posiedon Robot Constants
-  **********************************************************/
-
   // Spark MAX CAN IDs //
-  public static final int ALGAE_BAR_MOTOR_ID = 10; // Algae arm 
+  public static final int ALGAE_BAR_MOTOR_ID = 10; 
 
-  public static final int ALGAE_ARM_MOTOR_ID = 12; // Algae arm
+  public static final int ALGAE_ARM_MOTOR_ID = 12; 
   
   public static final int ELEVATOR_STAGE_1_MOTOR_ID = 11; // Tower
   
-  // public static final int ELEVATOR_STAGE_2_MOTOR_ID = 20; 
+  public static final int CORAL_WHEEL_MOTOR_ID = 13; 
 
-  public static final int END_EFFECTOR_WHEEL_MOTOR_ID = 13; 
-
-  public static final int END_EFFECTOR_ARM_MOTOR_ID = 9; 
+  public static final int CORAL_ARM_MOTOR_ID = 9; 
 
 
-  // PWM Ports //
   public static final int LED_PWM_ID = 4;
 
   // DIO (Digital Input/Output) Channels //
@@ -135,41 +128,41 @@ public final class Constants {
   public static final double ARM_SPEED = 0.2;
   public static final double WHEEL_SPEED = 0.6;
   public static final double ARM_GRAVITY_CONST = -0.03; 
-  public static final int ELEVATOR_ROTATIONS_PER_INCH = 13; // Number of rotations elevator climb motor must complete to
-                                                            // raise/lower elevator by one inch
+  // Number of rotations elevator climb motor must complete to raise/lower elevator by one inch
+  public static final int ELEVATOR_ROTATIONS_PER_INCH = 13; 
 
-  // Intake Constants
+  // CORAL Constants
   public static final double INTAKE_LIFT_GEAR_RATIO = 3 * 7 * 7 * 48 / 29;
 
-  public static final double INTAKE_ARM_MAX_POWER = 0.1;
-  public static final double INTAKE_ARM_MIN_POWER = 0.05;
-  public static final double INTAKE_ARM_kP = 0.025;
+  public static final double CORAL_ARM_MAX_POWER = 0.1;
+  public static final double CORAL_ARM_MIN_POWER = 0.05;
+  public static final double ALGAE_ARM_kP = 0.025;
 
   public static final double INTAKE_DEPLOY_LIMIT = 51;
   public static final double INTAKE_RETURN_LIMIT = 0;
 
-  public static final boolean INTAKE_ARM_INVERT = true;
-  
-  public static final double ALGAE_ARM_UP = 0.2; // Increase from 0.1
-  public static final double ALGAE_ARM_DOWN = -0.2; // Increase from 0.1
+  public static final boolean ALGAE_ARM_INVERT = true;
+  public static final boolean AGLAE_BAR_INVERT = false;
+  public static final double ALGAE_BAR_SPEED = 0.8;
 
-  public static final boolean INTAKE_BAR_INVERT = false;
-  public static final double INTAKE_BAR_SPEED = 0.8;
-
-  public static final double PICK_UP_ALGAE_POSITION = 33;
-  public static final double HOLD_ALGAE_POSITION = 2.0;
   public static final double PICK_UP_CORAL_POSITION = 53;
   public static final double HOLD_CORAL_POSITION = 24;
 
-  public static final double GRAVITY_RESISTANCE = 0.05; // TODO Adjust for gravity if needed
+  public static final double ALGAE_GRAVITY_RESISTANCE = 0.05; // TODO Adjust for gravity if needed
 
-   // Power settings for the wheel
-   public final static double WHEEL_FORWARD = 0.6;  // Positive power for forward
-   public final static double WHEEL_REVERSE = -0.6; // Negative power for reverse
+   public final static double CORAL_WHEEL_FORWARD = 0.6;  //
+   public final static double CORAL_WHEEL_REVERSE = -0.6; //
+   public final static double CORAL_ARM_FORWARD = 0.15; //
+   public final static double CORAL_ARM_REVERSE = -0.15; //
 
-   public final static double CORAL_ARM_FORWARD = 0.15; // Power for the coral arm
-   public final static double CORAL_ARM_REVERSE = -0.15; // Power for the coral arm
+  // ALGAE Constants
+  public static final double ALGAE_ARM_UP = 0.2; // Increase from 0.1
+  public static final double ALGAE_ARM_DOWN = -0.2; // Increase from 0.1
 
+  public static final double PICK_UP_ALGAE_POSITION = 33;
+  public static final double HOLD_ALGAE_POSITION = 2.0;
+
+  
   // REV PH Channels //
   // Example: public static final int EXTENSION_SOLENOID_ID = 0;
 

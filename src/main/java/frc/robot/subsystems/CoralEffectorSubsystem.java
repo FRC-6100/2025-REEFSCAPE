@@ -23,7 +23,7 @@ public class CoralEffectorSubsystem extends SubsystemBase {
     /** Subsystem for controlling the end effector wheel */
     public CoralEffectorSubsystem() {
         // Configure the Spark MAX motor controller
-        m_end_effector_wheel = new SparkMax(Constants.END_EFFECTOR_WHEEL_MOTOR_ID, MotorType.kBrushless);
+        m_end_effector_wheel = new SparkMax(Constants.CORAL_WHEEL_MOTOR_ID, MotorType.kBrushless);
         configureSparkMAX(m_end_effector_wheel, Constants.ELEVATOR_WHEEL_INVERT);
     }
     

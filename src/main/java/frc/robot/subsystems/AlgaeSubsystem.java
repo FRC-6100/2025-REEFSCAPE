@@ -37,13 +37,13 @@ public class AlgaeSubsystem extends SubsystemBase {
     // Initialize the intake bar motor (NEO 550)
     algaeIntakeMotor = new SparkMax(Constants.ALGAE_BAR_MOTOR_ID, MotorType.kBrushless);
     // algaeIntakeMotor.restoreFactoryDefaults();
-    algaeIntakeMotor.setInverted(Constants.INTAKE_BAR_INVERT);
+    algaeIntakeMotor.setInverted(Constants.AGLAE_BAR_INVERT);
     // algaeIntakeMotor.setSmartCurrentLimit(20); // Limiting current to protect the NEO 550
     
     // Initialize the arm motor (NEO 550)
     algaeArmMotor = new SparkMax(Constants.ALGAE_ARM_MOTOR_ID, MotorType.kBrushless);
     // algaeArmMotor.restoreFactoryDefaults();
-    algaeArmMotor.setInverted(Constants.INTAKE_ARM_INVERT);
+    algaeArmMotor.setInverted(Constants.ALGAE_ARM_INVERT);
     // algaeArmMotor.setSmartCurrentLimit(20); // Limiting current to protect the NEO 550
     
     // Get the encoder for the arm motor for position control
@@ -74,7 +74,7 @@ public class AlgaeSubsystem extends SubsystemBase {
    */
   public void setAlgaeArmSpeed(double percentOutput) {
     // Apply gravity compensation constant to help maintain position
-    algaeArmMotor.set(percentOutput + Constants.GRAVITY_RESISTANCE);
+    algaeArmMotor.set(percentOutput + Constants.ALGAE_GRAVITY_RESISTANCE);
   }
 
   /**
@@ -165,12 +165,12 @@ public class AlgaeSubsystem extends SubsystemBase {
       double currentPosition = getAlgaeArmPosition();
       double error = targetPosition - currentPosition;
       double output = Math.copySign(
-          Math.min(Math.abs(error * Constants.INTAKE_ARM_kP), Constants.INTAKE_ARM_MAX_POWER),
+          Math.min(Math.abs(error * Constants.ALGAE_ARM_kP), Constants.ALGAE_ARM_MAX_POWER),
           error);
           
       // Apply minimum power if we're still moving but ensure it's in the right direction
-      if (Math.abs(error) > 0.5 && Math.abs(output) < Constants.INTAKE_ARM_MIN_POWER) {
-        output = Math.copySign(Constants.INTAKE_ARM_MIN_POWER, error);
+      if (Math.abs(error) > 0.5 && Math.abs(output) < Constants.ALGAE_ARM_MIN_POWER) {
+        output = Math.copySign(Constants.ALGAE_ARM_MIN_POWER, error);
       }
       
       setAlgaeArmSpeed(output);
