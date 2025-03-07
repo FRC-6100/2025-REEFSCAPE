@@ -1,227 +1,257 @@
-// Author: UMN Robotics Ri3D
-// Last Updated: December 2024
-
 package frc.robot.subsystems;
 
-import frc.robot.Constants;
-// import frc.robot.commands.CoralElevatorSetPositionArmCommand;
-// import frc.robot.commands.CoralElevatorSetPositionClimbCommand;
-
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+
+/*
+ * This was copy and pasted from the Coral ArmSubsystem because some of the principles should be the same
+ */
 
 public class ElevatorSubsystem extends SubsystemBase {
+  private final SparkMax m_motor;
+  private final RelativeEncoder m_encoder;
+  private final SparkClosedLoopController m_controller;
 
-    // Coral Elevator Motor Controllers
-    private SparkMax m_elevator_climb_1; // NEO motor
-    private SparkMax m_elevator_climb_2; // NEO motor
-    private SparkMax m_elevator_arm; // NEO motor
-    private SparkMax m_elevator_wheel; // NEO motor
+  // The preset positions (in rotations)
+  /*
+   * Values derived from testing on Monday
+   * May need adjustments
+   * Theoritical max:
+   */
 
-    private double gravityControl;
+  // TODO Adjust these pose values based on your robot & testing
+  private final double POSITION_ZERO = 0.0;
+  private final double POSITION_ONE = -20.0;
+  private final double POSITION_TWO = -26.0;
 
-    // Coral Elevator limiters
-    public double climb_max_1 = 167.2;
-    public double climb_max_2 = 251;
-    public double climb_min_1 = 0;
-    public double climb_min_2 = 0;
-    public double arm_max = 39.4;
-    public double arm_min = 0;
+  // Current target position
+  private double m_targetPosition = 0;
 
-    /** Subsystem for controlling the coral elevator */
-    public ElevatorSubsystem() {
-      // Configure the Spark MAX motor controller using the new 2025 method
-      m_elevator_climb_1 = new SparkMax(Constants.ELEVATOR_MOTOR_ID, MotorType.kBrushless);
-      configureSparkMAX(m_elevator_climb_1, Constants.ELEVATOR_STAGE_1_INVERT);
-      // m_elevator_climb_2 = new SparkMax(Constants.ELEVATOR_STAGE_2_MOTOR_ID, MotorType.kBrushless);
-      // configureSparkMAX(m_elevator_climb_2, Constants.ELEVATOR_STAGE_2_INVERT);
-      m_elevator_arm = new SparkMax(Constants.END_EFFECTOR_ARM_MOTOR_ID, MotorType.kBrushless);
-      configureSparkMAX(m_elevator_arm, Constants.ELEVATOR_ARM_INVERT);
-      m_elevator_wheel = new SparkMax(Constants.END_EFFECTOR_WHEEL_MOTOR_ID, MotorType.kBrushless);
-      configureSparkMAX(m_elevator_wheel, Constants.ELEVATOR_WHEEL_INVERT);
-  
-      // Put the default speed on SmartDashboard if needed
-      // SmartDashboard.putNumber("Elevator Speed", Constants.ELEVATOR_SPEED);
-    }
-  
-    private void configureSparkMAX(SparkMax max, boolean reverse) {
-      SparkMaxConfig config = new SparkMaxConfig();
-      config.inverted(reverse).idleMode(IdleMode.kBrake);
-      max.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    }
-  
-  // Climb Motors Methods --------------------------------------------------------------------------------
+  // Constants for PID and feed forward
+  private static final double kP = 0.1;
+  private static final double kI = 0;
+  private static final double kD = 0;
+  // private static final double kFF = 0.05; // Feed forward to counteract gravity
 
-  /* Sets speed of the elevator CLimb motor one. Inbuilt limiters */
-  public void setSpeedClimbOne(double speed) {
-    // Spark Max set() method with inbuilt limiters
-    if ((speed > 0) && (getPositionClimbOne() > climb_max_1)) {
-      m_elevator_climb_1.set(0);
-    } else if ((speed < 0) && (getPositionClimbOne() < climb_min_1))  {
-      m_elevator_climb_1.set(0);
-    } else {
-      m_elevator_climb_1.set(speed);
-    }
-  }
-  
-  /* Gets position of the elevator climb motor one */
-  public double getPositionClimbOne() {
-    // Spark Max getEncoder().getPosition() method
-    return m_elevator_climb_1.getEncoder().getPosition();
-  }
+  // Constants for position control
+  private static final double OUTPUT_UP = 0.2; // Limits max speed of the Elevator
+  private static final double OUTPUT_DOWN = -0.2; // Limits max speed in reverse
+  private static final double POSITION_TOLERANCE = 0.1; // Rotations tolerance
 
-  /* Set climb motor one speed to 0 */
-  public void stopClimbOne() {
-    setSpeedClimbOne(0);
-  }
+  public ElevatorSubsystem() {
+    // Initialize the motor
+    m_motor = new SparkMax(Constants.ELEVATOR_MOTOR_ID, MotorType.kBrushless);
 
-  public double getGravityControl() {
-    return gravityControl;
-  }
+    // Configure motor
+    SparkMaxConfig config = new SparkMaxConfig();
+    config.idleMode(IdleMode.kBrake);
+    config.smartCurrentLimit(20); // Appropriate for Neo550
 
-  /* Sets speed of the elevator CLimb motor two. Inbuilt limiters */
-  public void setSpeedClimbTwo(double speed) {
-    // Spark Max set() method with inbuilt limiters
-    if ((speed > 0) && (getPositionClimbTwo() > climb_max_2)) {
-      m_elevator_climb_2.set(0);
-    } else if ((speed < 0) && (getPositionClimbTwo() < climb_min_2))  {
-      m_elevator_climb_2.set(0);
-    } else {
-      m_elevator_climb_2.set(speed);
-    }
-  }
-  
-  /* Gets position of the elevator climb motor two */
-  public double getPositionClimbTwo() {
-    // Spark Max getEncoder().getPosition() method
-    return m_elevator_climb_2.getEncoder().getPosition();
-  }
+    // Configure PID
+    config.closedLoop.pid(kP, kI, kD);
+    // config.closedLoop.ff(kFF);
+    config.closedLoop.outputRange(OUTPUT_DOWN, OUTPUT_UP);
 
-  /* Set Climb motor two speed to 0 */
-  public void stopClimbTwo() {
-    setSpeedClimbTwo(0);
-  }
+    // Apply configuration
+    // m_motor.applyConfig(config); // FIXME applyConfig is not quite working
 
-  /* Set speed of both climb motors at once */
-  public void setSpeedClimb(double speed_1, double speed_2) {
-    setSpeedClimbOne(speed_1);
-    setSpeedClimbTwo(speed_2);
-  }
+    // Get the encoder
+    m_encoder = m_motor.getEncoder();
 
-  /* Set both Climb motor speeds to 0 */
-  public void stopClimb() {
-    setSpeedClimbOne(0);
-    setSpeedClimbTwo(0);
-  }
+    // Reset encoder position to zero
+    m_encoder.setPosition(0);
 
-  
-  /* Sets position of elevator climb to Neutral preset */
-  // public void climbNeutral() {
-    // Calls CoralElevatorSetPositionClimbCommand()
-    // (new CoralElevatorSetPositionClimbCommand(0, 0)).schedule();
-  // }
+    // Get the closed loop controller
+    m_controller = m_motor.getClosedLoopController();
 
-  /* Sets position of elevator climb to low Goal preset */
-  // public void climbLowGoal() {
-    // Calls CoralElevatorSetPositionClimbCommand()
-    // (new CoralElevatorSetPositionClimbCommand(39.4, 59.5)).schedule();
-  // }
-
-  /* Sets position of elevator climb to Mid Goal preset */
-  // public void climbMidGoal() {
-    // Calls CoralElevatorSetPositionClimbCommand()
-    // (new CoralElevatorSetPositionClimbCommand(84.1, 133.4)).schedule();
-  // }
-
-  /* Sets position of elevator climb to High Goal preset */
-  // public void climbHighGoal() {
-    // Calls CoralElevatorSetPositionClimbCommand()
-    // (new CoralElevatorSetPositionClimbCommand(climb_max_1, climb_max_2)).schedule();
-  // }
-  
-  // Arm Motor Methods -------------------------------------------------------------------------------
-
-  /* Sets speed of the elevator Arm motor. Inbuilt limiters */
-  public void setSpeedArm(double speed) {
-    // Spark Max set() method with inbuilt limiters
-    if ((speed > 0) && (getPositionArm() > arm_max)) {
-      m_elevator_arm.set(0);
-    } else if ((speed < 0) && (getPositionArm() < arm_min))  {
-      m_elevator_arm.set(0);
-    } else {
-      m_elevator_arm.set(speed);
-    }
-  }
-
-  /* Gets position of the elevator Arm motor */
-  public double getPositionArm() {
-    // Spark Max getEncoder().getPosition() method
-    return m_elevator_arm.getEncoder().getPosition();
-  }
-
-  /* Set Arm speed to 0 */
-  public void stopArm() {
-    setSpeedArm(0);
-  }
-
-  /* Sets position of elevator Arm to Drop preset */
-  public void armDrop() {
-    // Calls CoralElevatorSetPositionArmCommand()
-    // (new CoralElevatorSetPositionArmCommand(arm_max)).schedule();
-  }
-
-  /* Sets position of elevator Arm to Intake preset */
-  public void armPlayerIntake() {
-    // Calls CoralElevatorSetPositionArmCommand()
-    // (new CoralElevatorSetPositionArmCommand(29.2)).schedule();
-  }
-
-  /* Sets position of elevator Arm to Vertical preset */
-  public void armVertical() {
-    // Calls CoralElevatorSetPositionArmCommand()
-    // (new CoralElevatorSetPositionArmCommand(17.5)).schedule();
-  }
-
-  /* Sets position of elevator Arm to Initial preset */
-  public void armInitial() {
-    // Calls CoralElevatorSetPositionArmCommand()
-    // (new CoralElevatorSetPositionArmCommand(arm_min)).schedule();
-  }
-
-  // Wheel Motor Methods ------------------------------------------------------------------------------
-
-  /* Sets speed of the elevator Wheel motor */
-  public void setSpeedWheel(double speed) {
-    // Spark Max set() method
-    m_elevator_wheel.set(speed);
-  }
-
-  /* Gets position of the elevator Wheel motor */
-  public double getPositionWheel() {
-    // Spark Max getEncoder().getPosition() method
-    return m_elevator_wheel.getEncoder().getPosition();
-  }
-
-  /* Sets speed of wheel motor to 0 */
-  public void stopWheel() {
-    setSpeedWheel(0);
+    // Set initial position target
+    m_targetPosition = m_encoder.getPosition();
   }
 
   @Override
   public void periodic() {
-    gravityControl = Math.sin((getPositionArm() / 70 * 2 * Math.PI) + Math.PI/2)*Constants.ARM_GRAVITY_CONST;
+    // Publish current position and target to SmartDashboard
+    SmartDashboard.putNumber("Elevator Position", m_encoder.getPosition());
+    SmartDashboard.putNumber("Elevator Target", m_targetPosition);
+    SmartDashboard.putBoolean("Elevator At Target", isAtTarget());
 
-    // Publish encoder values to SmartDashboard
-    SmartDashboard.putNumber("Elevator Climb 1 Position", getPositionClimbOne());
-    SmartDashboard.putNumber("Elevator Climb 2 Position", getPositionClimbTwo());
-    SmartDashboard.putNumber("Elevator Arm Position", getPositionArm());
-    SmartDashboard.putNumber("Elevator Wheel Position", getPositionWheel());
+    // Report motor status to SmartDashboard
+    SmartDashboard.putNumber("Elevator Motor Position", m_encoder.getPosition());
+    SmartDashboard.putNumber("Elevator Motor Velocity", m_encoder.getVelocity());
+    SmartDashboard.putNumber("Elevator Motor Applied Output", m_motor.getAppliedOutput());
+    SmartDashboard.putNumber("Elevator Motor Current", m_motor.getOutputCurrent());
+    // SmartDashboard.putString("Elevator Motor Idle Mode",
+    // m_motor.getIdleMode().toString());
+
+  }
+
+  /**
+   * Set the Elevator to position one
+   */
+  public void setPositionZero() {
+    setTargetPosition(POSITION_ZERO);
+  }
+
+  /**
+   * Set the Elevator to position one
+   */
+  public void setPositionOne() {
+    setTargetPosition(POSITION_ONE);
+  }
+
+  /**
+   * Set the Elevator to position two
+   */
+  public void setPositionTwo() {
+    setTargetPosition(POSITION_TWO);
+  }
+
+  /**
+   * Increment the target position
+   * 
+   * @param increment Amount to increment (positive or negative)
+   */
+  public void incrementPosition(double increment) {
+    setTargetPosition(m_targetPosition + increment);
+  }
+
+  /**
+   * Set a specific target position
+   * 
+   * @param position Target position in rotations
+   */
+  public void setTargetPosition(double position) {
+    // Set the target position
+    m_targetPosition = position;
+
+    // Apply the PID controller to reach the target
+    m_controller.setReference(m_targetPosition, ControlType.kPosition);
+  }
+
+  /**
+   * @return The current position of the Elevator in rotations
+   */
+  public double getCurrentPosition() {
+    return m_encoder.getPosition();
+  }
+
+  /**
+   * Check if the Elevator is at the target position
+   * 
+   * @return true if the Elevator is within tolerance of the target
+   */
+  public boolean isAtTarget() {
+    return Math.abs(m_encoder.getPosition() - m_targetPosition) < POSITION_TOLERANCE;
+  }
+  
+  public void setElevatorPower(double percentOutput) {
+    m_motor.set(percentOutput);
+  }
+
+  /**
+   * Stop the Elevator motor
+   */
+  public void stop() {
+    // When stopped, maintain the current position
+    m_targetPosition = m_encoder.getPosition();
+    m_controller.setReference(m_targetPosition, ControlType.kPosition);
+  }
+
+  // ==== COMMAND FACTORIES ====
+
+  /**
+   * Creates a command that moves the Elevator to position one
+   * 
+   * @return A command that moves the Elevator to position one
+   */
+  public Command positionZeroCommand() {
+    return Commands.runOnce(() -> setPositionZero(), this)
+        .andThen(Commands.waitUntil(this::isAtTarget));
+  }
+
+  /**
+   * Creates a command that moves the Elevator to position one
+   * 
+   * @return A command that moves the Elevator to position one
+   */
+  public Command positionOneCommand() {
+    return Commands.runOnce(() -> setPositionOne(), this)
+        .andThen(Commands.waitUntil(this::isAtTarget));
+  }
+
+  /**
+   * Creates a command that moves the Elevator to position two
+   * 
+   * @return A command that moves the Elevator to position two
+   */
+  public Command positionTwoCommand() {
+    return Commands.runOnce(() -> setPositionTwo(), this)
+        .andThen(Commands.waitUntil(this::isAtTarget));
+  }
+
+  /**
+   * Creates a command that moves the Elevator to a specific position
+   * 
+   * @param position The target position in rotations
+   * @return A command that moves the Elevator to the specified position
+   */
+  public Command positionCommand(double position) {
+    return Commands.runOnce(() -> setTargetPosition(position), this)
+        .andThen(Commands.waitUntil(this::isAtTarget));
+  }
+
+  /**
+   * Creates a command that handles incremental Elevator movement based on button
+   * inputs
+   * 
+   * @param incrementUp     Supplier that returns true when the Elevator should be
+   *                        moved up
+   * @param incrementDown   Supplier that returns true when the Elevator should be
+   *                        moved down
+   * @param incrementAmount The amount to increment by each time (rotations)
+   * @return A command that handles incremental Elevator movement
+   */
+  public Command incrementalCommand(
+      BooleanSupplier incrementUp,
+      BooleanSupplier incrementDown,
+      double incrementAmount) {
+
+    return Commands.run(() -> {
+      // Each execution, check if buttons are pressed and apply increments
+      if (incrementUp.getAsBoolean()) {
+        incrementPosition(incrementAmount);
+      }
+      if (incrementDown.getAsBoolean()) {
+        incrementPosition(-incrementAmount);
+      }
+    }, this);
+  }
+ 
+
+  /**
+   * Creates a command for direct motor control that properly stops when button is
+   * released
+   */
+  public Command setElevatorPowerCommand(double percentOutput) {
+    // Use startEnd to explicitly define what happens when command starts and ends
+    return Commands.startEnd(
+        // Start action (when button is pressed)
+        () -> setElevatorPower(percentOutput),
+        // End action (when button is released)
+        () -> setElevatorPower(0),
+        this);
   }
 }
