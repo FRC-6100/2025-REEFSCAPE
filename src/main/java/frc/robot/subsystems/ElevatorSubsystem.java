@@ -17,7 +17,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class CoralElevatorSubsystem extends SubsystemBase {
+public class ElevatorSubsystem extends SubsystemBase {
 
     // Coral Elevator Motor Controllers
     private SparkMax m_elevator_climb_1; // NEO motor
@@ -36,9 +36,9 @@ public class CoralElevatorSubsystem extends SubsystemBase {
     public double arm_min = 0;
 
     /** Subsystem for controlling the coral elevator */
-    public CoralElevatorSubsystem() {
+    public ElevatorSubsystem() {
       // Configure the Spark MAX motor controller using the new 2025 method
-      m_elevator_climb_1 = new SparkMax(Constants.ELEVATOR_STAGE_1_MOTOR_ID, MotorType.kBrushless);
+      m_elevator_climb_1 = new SparkMax(Constants.ELEVATOR_MOTOR_ID, MotorType.kBrushless);
       configureSparkMAX(m_elevator_climb_1, Constants.ELEVATOR_STAGE_1_INVERT);
       // m_elevator_climb_2 = new SparkMax(Constants.ELEVATOR_STAGE_2_MOTOR_ID, MotorType.kBrushless);
       // configureSparkMAX(m_elevator_climb_2, Constants.ELEVATOR_STAGE_2_INVERT);

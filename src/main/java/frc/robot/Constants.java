@@ -107,7 +107,7 @@ public final class Constants {
 
   public static final int ALGAE_ARM_MOTOR_ID = 12; // Algae arm
   
-  public static final int ELEVATOR_STAGE_1_MOTOR_ID = 11; // Tower
+  public static final int ELEVATOR_MOTOR_ID = 11; // Tower
   
   // public static final int ELEVATOR_STAGE_2_MOTOR_ID = 20; 
 
