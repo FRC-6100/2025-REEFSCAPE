@@ -49,7 +49,7 @@ public class CoralArmSubsystem extends SubsystemBase {
 
   public CoralArmSubsystem() {
     // Initialize the motor as a Neo550
-    m_motor = new SparkMax(Constants.END_EFFECTOR_ARM_MOTOR_ID, MotorType.kBrushless);
+    m_motor = new SparkMax(Constants.EFFECTOR_ARM_MOTOR_ID, MotorType.kBrushless);
 
     // Configure motor
     SparkMaxConfig config = new SparkMaxConfig();

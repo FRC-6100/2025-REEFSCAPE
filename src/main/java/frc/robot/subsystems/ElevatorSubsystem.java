@@ -1,11 +1,13 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.servohub.ServoHub.ResetMode;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import java.util.function.BooleanSupplier;
@@ -25,19 +27,6 @@ public class ElevatorSubsystem extends SubsystemBase {
   private final RelativeEncoder m_encoder;
   private final SparkClosedLoopController m_controller;
 
-  // The preset positions (in rotations)
-  /*
-   * Values derived from testing on Monday
-   * May need adjustments
-   * Theoritical max:
-   */
-
-  // TODO Adjust these pose values based on your robot & testing
-  private final double POSITION_ZERO = 0.0;
-  private final double POSITION_ONE = -20.0;
-  private final double POSITION_TWO = -26.0;
-
-  // Current target position
   private double m_targetPosition = 0;
 
   // Constants for PID and feed forward
@@ -45,11 +34,6 @@ public class ElevatorSubsystem extends SubsystemBase {
   private static final double kI = 0;
   private static final double kD = 0;
   // private static final double kFF = 0.05; // Feed forward to counteract gravity
-
-  // Constants for position control
-  private static final double OUTPUT_UP = 0.2; // Limits max speed of the Elevator
-  private static final double OUTPUT_DOWN = -0.2; // Limits max speed in reverse
-  private static final double POSITION_TOLERANCE = 0.1; // Rotations tolerance
 
   public ElevatorSubsystem() {
     // Initialize the motor
@@ -59,11 +43,14 @@ public class ElevatorSubsystem extends SubsystemBase {
     SparkMaxConfig config = new SparkMaxConfig();
     config.idleMode(IdleMode.kBrake);
     config.smartCurrentLimit(20); // Appropriate for Neo550
+    config.inverted(false); // Set to true if motor is inverted
+    config.idleMode(IdleMode.kBrake);
+    // config.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     // Configure PID
     config.closedLoop.pid(kP, kI, kD);
     // config.closedLoop.ff(kFF);
-    config.closedLoop.outputRange(OUTPUT_DOWN, OUTPUT_UP);
+    // config.closedLoop.outputRange(OUTPUT_DOWN, OUTPUT_UP);
 
     // Apply configuration
     // m_motor.applyConfig(config); // FIXME applyConfig is not quite working
@@ -102,21 +89,21 @@ public class ElevatorSubsystem extends SubsystemBase {
    * Set the Elevator to position one
    */
   public void setPositionZero() {
-    setTargetPosition(POSITION_ZERO);
+    setTargetPosition(ElevatorConstants.POSITION_ZERO);
   }
 
   /**
    * Set the Elevator to position one
    */
   public void setPositionOne() {
-    setTargetPosition(POSITION_ONE);
+    setTargetPosition(ElevatorConstants.POSITION_ONE);
   }
 
   /**
    * Set the Elevator to position two
    */
   public void setPositionTwo() {
-    setTargetPosition(POSITION_TWO);
+    setTargetPosition(ElevatorConstants.POSITION_TWO);
   }
 
   /**
@@ -154,7 +141,7 @@ public class ElevatorSubsystem extends SubsystemBase {
    * @return true if the Elevator is within tolerance of the target
    */
   public boolean isAtTarget() {
-    return Math.abs(m_encoder.getPosition() - m_targetPosition) < POSITION_TOLERANCE;
+    return Math.abs(m_encoder.getPosition() - m_targetPosition) < ElevatorConstants.POSITION_TOLERANCE;
   }
   
   public void setElevatorPower(double percentOutput) {

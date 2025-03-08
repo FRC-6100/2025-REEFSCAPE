@@ -98,10 +98,6 @@ public final class Constants {
     public static final double kFreeSpeedRpm = 5676;
   }
 
-  /********************************************************************* 
-   * This and below is from Posiedon Robot Constants
-  **********************************************************/
-
   // Spark MAX CAN IDs //
   public static final int ALGAE_BAR_MOTOR_ID = 10; // Algae arm 
 
@@ -111,9 +107,9 @@ public final class Constants {
   
   // public static final int ELEVATOR_STAGE_2_MOTOR_ID = 20; 
 
-  public static final int END_EFFECTOR_WHEEL_MOTOR_ID = 13; 
+  public static final int EFFECTOR_WHEEL_MOTOR_ID = 13; 
 
-  public static final int END_EFFECTOR_ARM_MOTOR_ID = 9; 
+  public static final int EFFECTOR_ARM_MOTOR_ID = 9; 
 
 
   // PWM Ports //
@@ -124,20 +120,11 @@ public final class Constants {
   // Example: public static final int RIGHT_ENCODER_CHANNEL_B = 1;
   // Example: public static final int LEFT_ENCODER_CHANNEL_A = 2;
   // Example: public static final int LEFT_ENCODER_CHANNEL_B = 3;
-
-
-  // Coral Elevator Constants
-  public static final boolean ELEVATOR_STAGE_1_INVERT = true; 
-  public static final boolean ELEVATOR_STAGE_2_INVERT = true;
-  public static final boolean ELEVATOR_WHEEL_INVERT = true;
-  public static final boolean ELEVATOR_ARM_INVERT = true;
-  public static final double ELEVATOR_SPEED = 0.2;
+  
   public static final double ARM_SPEED = 0.2;
   public static final double WHEEL_SPEED = 0.6;
   public static final double ARM_GRAVITY_CONST = -0.03; 
-  public static final int ELEVATOR_ROTATIONS_PER_INCH = 13; // Number of rotations elevator climb motor must complete to
-                                                            // raise/lower elevator by one inch
-
+  
   // Intake Constants
   public static final double INTAKE_LIFT_GEAR_RATIO = 3 * 7 * 7 * 48 / 29;
 
@@ -155,6 +142,8 @@ public final class Constants {
 
   public static final boolean INTAKE_BAR_INVERT = false;
   public static final double INTAKE_BAR_SPEED = 0.8;
+
+  public static final boolean EFFECTOR_WHEEL_INVERT = true;
 
   public static final double PICK_UP_ALGAE_POSITION = 33;
   public static final double HOLD_ALGAE_POSITION = 2.0;
