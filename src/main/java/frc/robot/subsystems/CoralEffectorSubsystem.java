@@ -18,13 +18,13 @@ public class CoralEffectorSubsystem extends SubsystemBase {
    
 
     // End Effector Wheel Motor Controller
-    private SparkMax m_end_effector_wheel; // NEO motor
+    private SparkMax m_effectorWheel; // NEO motor
     
     /** Subsystem for controlling the end effector wheel */
     public CoralEffectorSubsystem() {
         // Configure the Spark MAX motor controller
-        m_end_effector_wheel = new SparkMax(Constants.END_EFFECTOR_WHEEL_MOTOR_ID, MotorType.kBrushless);
-        configureSparkMAX(m_end_effector_wheel, Constants.ELEVATOR_WHEEL_INVERT);
+        m_effectorWheel = new SparkMax(Constants.EFFECTOR_WHEEL_MOTOR_ID, MotorType.kBrushless);
+        configureSparkMAX(m_effectorWheel, Constants.EFFECTOR_WHEEL_INVERT);
     }
     
     private void configureSparkMAX(SparkMax max, boolean reverse) {
@@ -38,7 +38,7 @@ public class CoralEffectorSubsystem extends SubsystemBase {
      * @param speed The speed to set (-1.0 to 1.0)
      */
     public void setWheelSpeed(double speed) {
-        m_end_effector_wheel.set(speed);
+        m_effectorWheel.set(speed);
     }
     
     /**
@@ -46,7 +46,7 @@ public class CoralEffectorSubsystem extends SubsystemBase {
      * @return Current encoder position
      */
     public double getPosition() {
-        return m_end_effector_wheel.getEncoder().getPosition();
+        return m_effectorWheel.getEncoder().getPosition();
     }
     
     /**
@@ -59,6 +59,7 @@ public class CoralEffectorSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         // Publish encoder values to SmartDashboard
-        SmartDashboard.putNumber("End Effector Wheel Position", getPosition());
+        SmartDashboard.putNumber("Effector Wheel/Speed", m_effectorWheel.getEncoder().getVelocity());
+        SmartDashboard.putNumber("Effector Wheel/Current", m_effectorWheel.getOutputCurrent());
     }
 }

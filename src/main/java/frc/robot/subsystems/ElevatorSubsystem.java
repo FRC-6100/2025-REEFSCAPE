@@ -1,11 +1,13 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.servohub.ServoHub.ResetMode;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import java.util.function.BooleanSupplier;
@@ -16,24 +18,15 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-public class CoralArmSubsystem extends SubsystemBase {
+/*
+ * This was copy and pasted from the Coral ArmSubsystem because some of the principles should be the same
+ */
+
+public class ElevatorSubsystem extends SubsystemBase {
   private final SparkMax m_motor;
   private final RelativeEncoder m_encoder;
   private final SparkClosedLoopController m_controller;
 
-  // The preset positions (in rotations)
-  /*
-   * Values derived from testing on Monday
-   * May need adjustments
-   * Theoritical max:
-   */
-
-  // TODO Adjust these pose values based on your robot & testing
-  private final double POSITION_ZERO = 0.0;
-  private final double POSITION_ONE = -20.0;
-  private final double POSITION_TWO = -26.0;
-
-  // Current target position
   private double m_targetPosition = 0;
 
   // Constants for PID and feed forward
@@ -42,24 +35,22 @@ public class CoralArmSubsystem extends SubsystemBase {
   private static final double kD = 0;
   // private static final double kFF = 0.05; // Feed forward to counteract gravity
 
-  // Constants for position control
-  private static final double MAX_OUTPUT = 0.4; // Limits max speed of the arm
-  private static final double MIN_OUTPUT = -0.4; // Limits max speed in reverse
-  private static final double POSITION_TOLERANCE = 0.1; // Rotations tolerance
-
-  public CoralArmSubsystem() {
-    // Initialize the motor as a Neo550
-    m_motor = new SparkMax(Constants.EFFECTOR_ARM_MOTOR_ID, MotorType.kBrushless);
+  public ElevatorSubsystem() {
+    // Initialize the motor
+    m_motor = new SparkMax(Constants.ELEVATOR_MOTOR_ID, MotorType.kBrushless);
 
     // Configure motor
     SparkMaxConfig config = new SparkMaxConfig();
     config.idleMode(IdleMode.kBrake);
     config.smartCurrentLimit(20); // Appropriate for Neo550
+    config.inverted(false); // Set to true if motor is inverted
+    config.idleMode(IdleMode.kBrake);
+    // config.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     // Configure PID
     config.closedLoop.pid(kP, kI, kD);
     // config.closedLoop.ff(kFF);
-    config.closedLoop.outputRange(MIN_OUTPUT, MAX_OUTPUT);
+    // config.closedLoop.outputRange(OUTPUT_DOWN, OUTPUT_UP);
 
     // Apply configuration
     // m_motor.applyConfig(config); // FIXME applyConfig is not quite working
@@ -80,39 +71,39 @@ public class CoralArmSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // Publish current position and target to SmartDashboard
-    SmartDashboard.putNumber("Arm Position", m_encoder.getPosition());
-    SmartDashboard.putNumber("Arm Target", m_targetPosition);
-    SmartDashboard.putBoolean("Arm At Target", isAtTarget());
+    SmartDashboard.putNumber("Elevator Position", m_encoder.getPosition());
+    SmartDashboard.putNumber("Elevator Target", m_targetPosition);
+    SmartDashboard.putBoolean("Elevator At Target", isAtTarget());
 
     // Report motor status to SmartDashboard
-    SmartDashboard.putNumber("Arm Motor Position", m_encoder.getPosition());
-    SmartDashboard.putNumber("Arm Motor Velocity", m_encoder.getVelocity());
-    SmartDashboard.putNumber("Arm Motor Applied Output", m_motor.getAppliedOutput());
-    SmartDashboard.putNumber("Arm Motor Current", m_motor.getOutputCurrent());
-    // SmartDashboard.putString("Arm Motor Idle Mode",
+    SmartDashboard.putNumber("Elevator Motor Position", m_encoder.getPosition());
+    SmartDashboard.putNumber("Elevator Motor Velocity", m_encoder.getVelocity());
+    SmartDashboard.putNumber("Elevator Motor Applied Output", m_motor.getAppliedOutput());
+    SmartDashboard.putNumber("Elevator Motor Current", m_motor.getOutputCurrent());
+    // SmartDashboard.putString("Elevator Motor Idle Mode",
     // m_motor.getIdleMode().toString());
 
   }
 
   /**
-   * Set the arm to position one
+   * Set the Elevator to position one
    */
   public void setPositionZero() {
-    setTargetPosition(POSITION_ZERO);
+    setTargetPosition(ElevatorConstants.POSITION_ZERO);
   }
 
   /**
-   * Set the arm to position one
+   * Set the Elevator to position one
    */
   public void setPositionOne() {
-    setTargetPosition(POSITION_ONE);
+    setTargetPosition(ElevatorConstants.POSITION_ONE);
   }
 
   /**
-   * Set the arm to position two
+   * Set the Elevator to position two
    */
   public void setPositionTwo() {
-    setTargetPosition(POSITION_TWO);
+    setTargetPosition(ElevatorConstants.POSITION_TWO);
   }
 
   /**
@@ -138,27 +129,27 @@ public class CoralArmSubsystem extends SubsystemBase {
   }
 
   /**
-   * @return The current position of the arm in rotations
+   * @return The current position of the Elevator in rotations
    */
   public double getCurrentPosition() {
     return m_encoder.getPosition();
   }
 
   /**
-   * Check if the arm is at the target position
+   * Check if the Elevator is at the target position
    * 
-   * @return true if the arm is within tolerance of the target
+   * @return true if the Elevator is within tolerance of the target
    */
   public boolean isAtTarget() {
-    return Math.abs(m_encoder.getPosition() - m_targetPosition) < POSITION_TOLERANCE;
+    return Math.abs(m_encoder.getPosition() - m_targetPosition) < ElevatorConstants.POSITION_TOLERANCE;
   }
   
-  public void setCoralArmPower(double percentOutput) {
+  public void setElevatorPower(double percentOutput) {
     m_motor.set(percentOutput);
   }
 
   /**
-   * Stop the arm motor
+   * Stop the Elevator motor
    */
   public void stop() {
     // When stopped, maintain the current position
@@ -169,9 +160,9 @@ public class CoralArmSubsystem extends SubsystemBase {
   // ==== COMMAND FACTORIES ====
 
   /**
-   * Creates a command that moves the arm to position one
+   * Creates a command that moves the Elevator to position one
    * 
-   * @return A command that moves the arm to position one
+   * @return A command that moves the Elevator to position one
    */
   public Command positionZeroCommand() {
     return Commands.runOnce(() -> setPositionZero(), this)
@@ -179,9 +170,9 @@ public class CoralArmSubsystem extends SubsystemBase {
   }
 
   /**
-   * Creates a command that moves the arm to position one
+   * Creates a command that moves the Elevator to position one
    * 
-   * @return A command that moves the arm to position one
+   * @return A command that moves the Elevator to position one
    */
   public Command positionOneCommand() {
     return Commands.runOnce(() -> setPositionOne(), this)
@@ -189,9 +180,9 @@ public class CoralArmSubsystem extends SubsystemBase {
   }
 
   /**
-   * Creates a command that moves the arm to position two
+   * Creates a command that moves the Elevator to position two
    * 
-   * @return A command that moves the arm to position two
+   * @return A command that moves the Elevator to position two
    */
   public Command positionTwoCommand() {
     return Commands.runOnce(() -> setPositionTwo(), this)
@@ -199,10 +190,10 @@ public class CoralArmSubsystem extends SubsystemBase {
   }
 
   /**
-   * Creates a command that moves the arm to a specific position
+   * Creates a command that moves the Elevator to a specific position
    * 
    * @param position The target position in rotations
-   * @return A command that moves the arm to the specified position
+   * @return A command that moves the Elevator to the specified position
    */
   public Command positionCommand(double position) {
     return Commands.runOnce(() -> setTargetPosition(position), this)
@@ -210,15 +201,15 @@ public class CoralArmSubsystem extends SubsystemBase {
   }
 
   /**
-   * Creates a command that handles incremental arm movement based on button
+   * Creates a command that handles incremental Elevator movement based on button
    * inputs
    * 
-   * @param incrementUp     Supplier that returns true when the arm should be
+   * @param incrementUp     Supplier that returns true when the Elevator should be
    *                        moved up
-   * @param incrementDown   Supplier that returns true when the arm should be
+   * @param incrementDown   Supplier that returns true when the Elevator should be
    *                        moved down
    * @param incrementAmount The amount to increment by each time (rotations)
-   * @return A command that handles incremental arm movement
+   * @return A command that handles incremental Elevator movement
    */
   public Command incrementalCommand(
       BooleanSupplier incrementUp,
@@ -241,13 +232,13 @@ public class CoralArmSubsystem extends SubsystemBase {
    * Creates a command for direct motor control that properly stops when button is
    * released
    */
-  public Command setCoralArmPowerCommand(double percentOutput) {
+  public Command setElevatorPowerCommand(double percentOutput) {
     // Use startEnd to explicitly define what happens when command starts and ends
     return Commands.startEnd(
         // Start action (when button is pressed)
-        () -> setCoralArmPower(percentOutput),
+        () -> setElevatorPower(percentOutput),
         // End action (when button is released)
-        () -> setCoralArmPower(0),
+        () -> setElevatorPower(0),
         this);
   }
 }
