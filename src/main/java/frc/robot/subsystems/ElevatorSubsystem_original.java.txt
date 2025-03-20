@@ -3,49 +3,48 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 // import frc.robot.commands.CoralElevatorSetPositionArmCommand;
 // import frc.robot.commands.CoralElevatorSetPositionClimbCommand;
 
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-public class CoralElevatorSubsystem extends SubsystemBase {
+public class ElevatorSubsystem extends SubsystemBase {
 
     // Coral Elevator Motor Controllers
-    private SparkMax m_elevator_climb_1; // NEO motor
-    private SparkMax m_elevator_climb_2; // NEO motor
-    private SparkMax m_elevator_arm; // NEO motor
-    private SparkMax m_elevator_wheel; // NEO motor
+    private SparkMax m_elevatorWinch; // NEO motor. ** SEE ALSO m_elevatorWinch**
+    // private SparkMax m_elevator_climb_2; // NEO motor
+    // private SparkMax m_elevator_arm; // NEO motor
+    // private SparkMax m_elevator_wheel; // NEO motor
 
     private double gravityControl;
 
     // Coral Elevator limiters
     public double climb_max_1 = 167.2;
-    public double climb_max_2 = 251;
+    // public double climb_max_2 = 251;
     public double climb_min_1 = 0;
-    public double climb_min_2 = 0;
-    public double arm_max = 39.4;
-    public double arm_min = 0;
+    // public double climb_min_2 = 0;
+    // public double arm_max = 39.4;
+    // public double arm_min = 0;
 
     /** Subsystem for controlling the coral elevator */
-    public CoralElevatorSubsystem() {
+    public ElevatorSubsystem() {
       // Configure the Spark MAX motor controller using the new 2025 method
-      m_elevator_climb_1 = new SparkMax(Constants.ELEVATOR_STAGE_1_MOTOR_ID, MotorType.kBrushless);
-      configureSparkMAX(m_elevator_climb_1, Constants.ELEVATOR_STAGE_1_INVERT);
+      m_elevatorWinch = new SparkMax(Constants.ELEVATOR_MOTOR_ID, MotorType.kBrushless);
+      configureSparkMAX(m_elevatorWinch, Constants.ELEVATOR_STAGE_1_INVERT);
       // m_elevator_climb_2 = new SparkMax(Constants.ELEVATOR_STAGE_2_MOTOR_ID, MotorType.kBrushless);
       // configureSparkMAX(m_elevator_climb_2, Constants.ELEVATOR_STAGE_2_INVERT);
-      m_elevator_arm = new SparkMax(Constants.END_EFFECTOR_ARM_MOTOR_ID, MotorType.kBrushless);
-      configureSparkMAX(m_elevator_arm, Constants.ELEVATOR_ARM_INVERT);
-      m_elevator_wheel = new SparkMax(Constants.END_EFFECTOR_WHEEL_MOTOR_ID, MotorType.kBrushless);
-      configureSparkMAX(m_elevator_wheel, Constants.ELEVATOR_WHEEL_INVERT);
+      // m_elevator_arm = new SparkMax(Constants.END_EFFECTOR_ARM_MOTOR_ID, MotorType.kBrushless);
+      // configureSparkMAX(m_elevator_arm, Constants.ELEVATOR_ARM_INVERT);
+      // m_elevator_wheel = new SparkMax(Constants.END_EFFECTOR_WHEEL_MOTOR_ID, MotorType.kBrushless);
+      // configureSparkMAX(m_elevator_wheel, Constants.ELEVATOR_WHEEL_INVERT);
   
       // Put the default speed on SmartDashboard if needed
       // SmartDashboard.putNumber("Elevator Speed", Constants.ELEVATOR_SPEED);
@@ -63,18 +62,18 @@ public class CoralElevatorSubsystem extends SubsystemBase {
   public void setSpeedClimbOne(double speed) {
     // Spark Max set() method with inbuilt limiters
     if ((speed > 0) && (getPositionClimbOne() > climb_max_1)) {
-      m_elevator_climb_1.set(0);
+      m_elevatorWinch.set(0);
     } else if ((speed < 0) && (getPositionClimbOne() < climb_min_1))  {
-      m_elevator_climb_1.set(0);
+      m_elevatorWinch.set(0);
     } else {
-      m_elevator_climb_1.set(speed);
+      m_elevatorWinch.set(speed);
     }
   }
   
   /* Gets position of the elevator climb motor one */
   public double getPositionClimbOne() {
     // Spark Max getEncoder().getPosition() method
-    return m_elevator_climb_1.getEncoder().getPosition();
+    return m_elevatorWinch.getEncoder().getPosition();
   }
 
   /* Set climb motor one speed to 0 */
