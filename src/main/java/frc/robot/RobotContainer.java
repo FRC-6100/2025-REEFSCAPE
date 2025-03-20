@@ -9,11 +9,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.AutonCommands;
 import frc.robot.commands.SetWheelSpeedCommand;
-import frc.robot.subsystems.AlgaeSubsystem;
-import frc.robot.subsystems.CoralArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.AlgaeArmSubsystem;
+import frc.robot.subsystems.AlgaeEffectorSubsystem;
+import frc.robot.subsystems.CoralArmSubsystem;
+
 import frc.robot.subsystems.ElevatorConstants;
 import frc.robot.subsystems.ElevatorSubsystem;
+
 import frc.robot.subsystems.CoralEffectorSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -30,11 +33,11 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 public class RobotContainer {
     // -------------------- Subsystems --------------------
     private final DriveSubsystem m_robotDrive = new DriveSubsystem();
-    private final CoralArmSubsystem m_arm = new CoralArmSubsystem();
-    private final CoralEffectorSubsystem m_endEffector = new CoralEffectorSubsystem();
-    private final AlgaeSubsystem m_algaeSubsystem = new AlgaeSubsystem();
+    private final CoralArmSubsystem m_coralArm = new CoralArmSubsystem();
+    private final CoralEffectorSubsystem m_coralEffector = new CoralEffectorSubsystem();
+    private final AlgaeArmSubsystem m_algaeArm = new AlgaeArmSubsystem();
+    private final AlgaeEffectorSubsystem m_algaeEffector = new AlgaeEffectorSubsystem();
     private final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
-
     
     // -------------------- Controllers --------------------
     private final CommandXboxController driverController = new CommandXboxController(0);
@@ -69,8 +72,8 @@ public class RobotContainer {
         );
 
         // Default arm command - Incremental control using POV buttons
-        m_arm.setDefaultCommand(
-            m_arm.incrementalCommand(
+        m_coralArm.setDefaultCommand(
+            m_coralArm.incrementalCommand(
                 () -> operatorController.povLeft().getAsBoolean(),
                 () -> operatorController.povRight().getAsBoolean(),
                 0.01) // Small increment since this runs continuously
@@ -121,11 +124,11 @@ public class RobotContainer {
     private void configureOperatorButtons() {
         // Coral arm manual control
         operatorController.a().whileTrue(
-            m_arm.setCoralArmPowerCommand(Constants.CORAL_ARM_FORWARD)
+            m_coralArm.setCoralArmPowerCommand(Constants.CORAL_ARM_FORWARD)
         );
         
         operatorController.b().whileTrue(
-            m_arm.setCoralArmPowerCommand(Constants.CORAL_ARM_REVERSE)
+            m_coralArm.setCoralArmPowerCommand(Constants.CORAL_ARM_REVERSE)
         );
 
         // Algae arm position presets
@@ -140,22 +143,22 @@ public class RobotContainer {
         // End effector wheel control
         operatorController.rightBumper().whileTrue(
             new SetWheelSpeedCommand(
-                m_endEffector, () -> Constants.WHEEL_REVERSE)
+                m_coralEffector, () -> Constants.WHEEL_REVERSE)
         );
 
         operatorController.leftBumper().whileTrue(
             new SetWheelSpeedCommand(
-                m_endEffector, () -> Constants.WHEEL_FORWARD)
+                m_coralEffector, () -> Constants.WHEEL_FORWARD)
         );
 
         // Algae intake control - proportional to trigger pressure
         operatorController.leftTrigger(0.1).whileTrue(
-            m_algaeSubsystem.runAlgaeIntakeCommand(
+            m_algaeEffector.runAlgaeIntakeCommand(
                 () -> operatorController.getLeftTriggerAxis() * Constants.INTAKE_BAR_SPEED)
         );
 
         operatorController.rightTrigger(0.1).whileTrue(
-            m_algaeSubsystem.runAlgaeIntakeCommand(
+            m_algaeEffector.runAlgaeIntakeCommand(
                 () -> -operatorController.getRightTriggerAxis() * Constants.INTAKE_BAR_SPEED)
         );
 
@@ -163,11 +166,11 @@ public class RobotContainer {
         
         // Manual algae arm adjustment
         operatorController.povUp().whileTrue(
-            m_algaeSubsystem.runAlgaeArmCommand(Constants.ALGAE_ARM_UP)
+            m_algaeArm.runAlgaeArmCommand(Constants.ALGAE_ARM_UP)
         );
         
         operatorController.povDown().whileTrue(
-            m_algaeSubsystem.runAlgaeArmCommand(-Constants.ALGAE_ARM_DOWN)
+            m_algaeArm.runAlgaeArmCommand(-Constants.ALGAE_ARM_DOWN)
         );
     }
 
@@ -176,7 +179,7 @@ private void configureAutonOptions() {
         m_autoChooser.setDefaultOption("Drive Forward",
              AutonCommands.driveForward(m_robotDrive));
         m_autoChooser.addOption("Score and Drive", 
-            AutonCommands.scoreAndDrive(m_robotDrive, m_arm, m_endEffector));
+            AutonCommands.scoreAndDrive(m_robotDrive, m_coralArm, m_coralEffector));
         m_autoChooser.addOption("Do Nothing", 
             Commands.none());
         
