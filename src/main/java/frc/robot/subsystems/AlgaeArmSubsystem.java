@@ -40,7 +40,7 @@ public class AlgaeArmSubsystem extends SubsystemBase {
    */
   public void setAlgaeArmSpeed(double percentOutput) {
     // Apply gravity compensation constant to help maintain position
-    algaeArmMotor.set(percentOutput + Constants.GRAVITY_RESISTANCE);
+    algaeArmMotor.set(percentOutput + Constants.ALGAE_ARM_GRAVITY_RESISTANCE);
   }
 
   /**
