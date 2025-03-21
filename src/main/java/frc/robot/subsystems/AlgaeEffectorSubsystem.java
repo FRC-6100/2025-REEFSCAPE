@@ -10,6 +10,8 @@ import frc.robot.Constants;
 
 import java.util.function.DoubleSupplier;
 
+@SuppressWarnings("unused")
+
 public class AlgaeEffectorSubsystem extends SubsystemBase {
   // Create the motor controller
   private final SparkMax algaeIntakeMotor;

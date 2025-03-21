@@ -132,6 +132,10 @@ public class RobotContainer {
         );
 
         // Algae arm position presets
+        /* TODO Test the elevator values, and adjust the speed constants.
+        * I'll start working on presets which uses a different control mode.
+        * I'm hoping that simple "power" at least works for now.
+        */ 
         operatorController.x().whileTrue(
             m_elevator.setElevatorPowerCommand(ElevatorConstants.SPEED_UP)
         );

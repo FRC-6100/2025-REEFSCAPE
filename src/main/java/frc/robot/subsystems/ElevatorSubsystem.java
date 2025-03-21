@@ -18,6 +18,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
+@SuppressWarnings("unused")
+
 /*
  * This was copy and pasted from the Coral ArmSubsystem because some of the principles should be the same
  */

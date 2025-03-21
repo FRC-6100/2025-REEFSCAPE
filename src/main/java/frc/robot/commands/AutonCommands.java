@@ -51,7 +51,7 @@ public final class AutonCommands {
         Trajectory trajectory = TrajectoryGenerator.generateTrajectory(
             new Pose2d(0, 0, new Rotation2d(0)),
             List.of(),
-            new Pose2d(1.2, 0, new Rotation2d(0)),              // <--TODO adjust as needed
+            new Pose2d(1.2, 0, new Rotation2d(0)),
             config
         );
 
@@ -111,13 +111,13 @@ public final class AutonCommands {
             Commands.run(
                 () -> armSubsystem.setCoralArmPower(Constants.CORAL_ARM_FORWARD),
                 armSubsystem
-            ).withTimeout(0.35),     // <--TODO adjust as needed
+            ).withTimeout(0.35),
             
             // Then run the end effector for 0.5 seconds
             Commands.run(
                 () -> endEffectorSubsystem.setWheelSpeed(Constants.WHEEL_FORWARD),
                 endEffectorSubsystem
-            ).withTimeout(0.5),     // <--TODO adjust as needed
+            ).withTimeout(0.5),
             
             // Finally, ensure everything is stopped
             Commands.parallel(

@@ -150,8 +150,7 @@ public final class Constants {
   public static final double PICK_UP_CORAL_POSITION = 53;
   public static final double HOLD_CORAL_POSITION = 24;
 
-  public static final double GRAVITY_RESISTANCE = 0.05; // TODO Adjust for gravity if needed
-
+  public static final double GRAVITY_RESISTANCE = 0.05;
    // Power settings for the wheel
    public final static double WHEEL_FORWARD = 0.6;  // Positive power for forward
    public final static double WHEEL_REVERSE = -0.6; // Negative power for reverse

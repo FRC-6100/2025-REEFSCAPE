@@ -28,7 +28,7 @@ public class CoralArmSubsystem extends SubsystemBase {
    * Theoritical max:
    */
 
-  // TODO Adjust these pose values based on your robot & testing
+  // Adjust these pose values based on your robot & testing
   private final double POSITION_ZERO = 0.0;
   private final double POSITION_ONE = -20.0;
   private final double POSITION_TWO = -26.0;
