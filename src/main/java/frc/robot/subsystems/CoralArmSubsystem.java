@@ -51,7 +51,7 @@ public class CoralArmSubsystem extends SubsystemBase {
     private static final double REVERSE_LIMIT = -28.0; // Maximum reverse position
 
     // PID Constants
-    private static final double kP = 0.10;
+    private static final double kP = 0.50;
     private static final double kI = 0.00;
     private static final double kD = 0.00; // 1.0?
     private static final double kFF = 0.05; // Feed forward component
@@ -140,8 +140,7 @@ public class CoralArmSubsystem extends SubsystemBase {
       }
       
       // Store the target and apply to controller
-      m_controller.setReference(m_targetPosition, ControlType.kPosition, ClosedLoopSlot.kSlot0, 0);
-      m_controller.setReference(m_targetPosition, ControlType.kPosition);
+      m_controller.setReference(m_targetPosition, ControlType.kPosition, ClosedLoopSlot.kSlot0, 0.05);
   }
 
   /**
