@@ -108,10 +108,12 @@ public final class AutonCommands {
             driveForward(driveSubsystem),
             
             // Then rotate the arm for 0.5 seconds
+            /* FIXME
             Commands.run(
                 () -> armSubsystem.setCoralArmPower(Constants.CORAL_ARM_FORWARD),
                 armSubsystem
             ).withTimeout(0.35),
+             */
             
             // Then run the end effector for 0.5 seconds
             Commands.run(
@@ -122,7 +124,7 @@ public final class AutonCommands {
             // Finally, ensure everything is stopped
             Commands.parallel(
                 Commands.runOnce(() -> driveSubsystem.drive(0, 0, 0, false), driveSubsystem),
-                Commands.runOnce(() -> armSubsystem.setCoralArmPower(0), armSubsystem),
+                // Commands.runOnce(() -> armSubsystem.setCoralArmPower(0), armSubsystem), // FIXME
                 Commands.runOnce(() -> endEffectorSubsystem.setWheelSpeed(0), endEffectorSubsystem)
             )
         );
@@ -192,11 +194,14 @@ public final class AutonCommands {
             // Execute the trajectory
             swerveControllerCommand,
             // Run the arm for the specified time
+
+            /* FIXME
             Commands.run(
                 () -> armSubsystem.setCoralArmPower(Constants.CORAL_ARM_FORWARD),
                 armSubsystem
             ).withTimeout(armTime),
             // Run the wheel for the specified time
+             */
             Commands.run(
                 () -> endEffectorSubsystem.setWheelSpeed(Constants.WHEEL_FORWARD),
                 endEffectorSubsystem
@@ -204,7 +209,7 @@ public final class AutonCommands {
             // Stop everything
             Commands.parallel(
                 Commands.runOnce(() -> driveSubsystem.drive(0, 0, 0, false), driveSubsystem),
-                Commands.runOnce(() -> armSubsystem.setCoralArmPower(0), armSubsystem),
+                // Commands.runOnce(() -> armSubsystem.setCoralArmPower(0), armSubsystem), // FIXME
                 Commands.runOnce(() -> endEffectorSubsystem.setWheelSpeed(0), endEffectorSubsystem)
             )
         );

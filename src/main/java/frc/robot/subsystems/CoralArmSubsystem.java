@@ -2,15 +2,14 @@ package frc.robot.subsystems;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-
-import java.util.function.BooleanSupplier;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -19,245 +18,203 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class CoralArmSubsystem extends SubsystemBase {
-  private final SparkMax m_motor;
-  private final RelativeEncoder m_encoder;
-  private final SparkClosedLoopController m_controller;
+    private final SparkMax m_motor;
+    private final RelativeEncoder m_encoder;
+    private final SparkClosedLoopController m_controller;
 
-  // The preset positions (in rotations)
-  /*
-   * Values derived from testing on Monday
-   * May need adjustments
-   * Theoritical max:
-   */
+    // Define preset positions (in rotations)
+    public enum ArmPosition {
+        STOWED(0.0),
+        POSE_ONE(-5.0),
+        POSE_TWO(-15.0),
+        POSE_THREE(-25.0);
+        
+        private final double position;
+        
+        ArmPosition(double position) {
+            this.position = position;
+        }
+        
+        public double getPosition() {
+            return position;
+        }
+    }
 
-  // Adjust these pose values based on your robot & testing
-  private final double POSITION_ZERO = 0.0;
-  private final double POSITION_ONE = -20.0;
-  private final double POSITION_TWO = -26.0;
+    // Current target position
+    private double m_targetPosition = 0;
 
-  // Current target position
-  private double m_targetPosition = 0;
+    // Increment value for small adjustments
+    private static final double INCREMENT_VALUE = 0.5; // Adjust based on testing
+    
+    // Soft limits to prevent mechanism damage
+    private static final double FORWARD_LIMIT = 2.0;   // Maximum forward position
+    private static final double REVERSE_LIMIT = -28.0; // Maximum reverse position
 
-  // Constants for PID and feed forward
-  private static final double kP = 0.1;
-  private static final double kI = 0;
-  private static final double kD = 0;
-  private static final double kFF = 0.05; // Feed forward to counteract gravity
+    // PID Constants
+    private static final double kP = 0.10;
+    private static final double kI = 0.00;
+    private static final double kD = 0.00; // 1.0?
+    private static final double kFF = 0.05; // Feed forward component
 
-  /*
-   * You will need to tune the kFF value based on testing.
-   * Start with this value of 0.05, and then:
-   * If the arm still drops too quickly, increase the value
-   * If the arm struggles to move downward, decrease the value
-   * The SmartDashboard outputs will be very helpful for tuning - pay attention to the "Arm Motor Applied Output" to see the effect of your PIDF controller.
-   * This is a "simplistic" approach of constantly applying a bit of trickle power to counteract gravity. 
-   * A more advanced approach would be to use a gravity compensation that actually varies based on the arm's position.
-   * Start with this simple approach tonight/Saturday,
-   * and then we can discuss more advanced options as I work on actual position control modes.
-   */
+    // Position control constants
+    private static final double MAX_OUTPUT = 0.4; // Limits max speed
+    private static final double MIN_OUTPUT = -0.4;
+    private static final double POSITION_TOLERANCE = 0.5; // Acceptable error
 
-  // Constants for position control
-  private static final double MAX_OUTPUT = 0.4; // Limits max speed of the arm
-  private static final double MIN_OUTPUT = -0.4; // Limits max speed in reverse
-  private static final double POSITION_TOLERANCE = 0.1; // Rotations tolerance
+    public CoralArmSubsystem() {
+      // Initialize the motor
+      m_motor = new SparkMax(Constants.EFFECTOR_ARM_MOTOR_ID, MotorType.kBrushless);
 
-  public CoralArmSubsystem() {
-    // Initialize the motor as a Neo550
-    m_motor = new SparkMax(Constants.EFFECTOR_ARM_MOTOR_ID, MotorType.kBrushless);
+      // Configure motor
+      SparkMaxConfig config = new SparkMaxConfig();
+      config.idleMode(IdleMode.kBrake);
+      config.smartCurrentLimit(20); // Appropriate for Neo550
+      config.inverted(false); // Set appropriate direction
 
-    // Configure motor
-    SparkMaxConfig config = new SparkMaxConfig();
-    config.idleMode(IdleMode.kBrake);
-    config.smartCurrentLimit(20); // Appropriate for Neo550
+      // Configure PID and feed forward
+      config.closedLoop.pidf(kP, kI, kD, kFF);
+      config.closedLoop.outputRange(MIN_OUTPUT, MAX_OUTPUT);
 
-    // Configure PIDF
-    config.closedLoop.pidf(kP, kI, kD, kFF);
-    config.closedLoop.outputRange(MIN_OUTPUT, MAX_OUTPUT);
+      // Apply configuration
+      m_motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    // Apply configuration
-    m_motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+      // Get the encoder and controller
+      m_encoder = m_motor.getEncoder();
+      m_controller = m_motor.getClosedLoopController();
 
-    // Get the encoder
-    m_encoder = m_motor.getEncoder();
-
-    // Reset encoder position to zero
-    m_encoder.setPosition(0);
-
-    // Get the closed loop controller
-    m_controller = m_motor.getClosedLoopController();
-
-    // Set initial position target
-    m_targetPosition = m_encoder.getPosition();
+      // Reset encoder position to zero on startup
+      m_encoder.setPosition(0);
+      
+      // Initialize target position to current position
+      m_targetPosition = m_encoder.getPosition();
   }
 
   @Override
   public void periodic() {
-    // Publish current position and target to SmartDashboard
-    SmartDashboard.putNumber("Arm/Position", m_encoder.getPosition());
-    SmartDashboard.putNumber("Arm/Target", m_targetPosition);
-    SmartDashboard.putBoolean("Arm/At Target", isAtTarget());
-    SmartDashboard.putNumber("Arm/Velocity", m_encoder.getVelocity());
-    SmartDashboard.putNumber("Arm/Applied Output", m_motor.getAppliedOutput());
-    SmartDashboard.putNumber("Arm/Motor Current", m_motor.getOutputCurrent());
-    // SmartDashboard.putString("Arm Motor Idle Mode",
-    // m_motor.getIdleMode().toString());
+      // Apply gravity compensation based on arm angle
+      // This is a simple cosine-based model - adjust as needed
+      double gravityCompensation = Math.cos(getCurrentPosition() * 0.1) * 0.05;
+      // Add compensation to the target position control
+      if (Math.abs(getCurrentPosition() - m_targetPosition) < 0.5) {
+          // Only apply when near the target to avoid interfering with main movement
+          m_controller.setReference(m_targetPosition, ControlType.kPosition, ClosedLoopSlot.kSlot0, gravityCompensation);
+      }
 
+      
+      
+      // Publish to SmartDashboard for monitoring
+      SmartDashboard.putNumber("Arm/Current Position", getCurrentPosition());
+      SmartDashboard.putNumber("Arm/Target Position", m_targetPosition);
+      SmartDashboard.putNumber("Arm/Position Error", m_targetPosition - getCurrentPosition());
+      SmartDashboard.putBoolean("Arm/At Target", isAtPosition(m_targetPosition));
+      SmartDashboard.putNumber("Arm/Gravity Compensation", gravityCompensation);
+      SmartDashboard.putNumber("Arm/Motor Output", m_motor.getAppliedOutput());
+      SmartDashboard.putNumber("Arm/Motor Current", m_motor.getOutputCurrent());
   }
 
   /**
-   * Set the arm to position one
+   * Gets the current arm position
+   * @return Position in rotations
    */
-  public void setPositionZero() {
-    setTargetPosition(POSITION_ZERO);
+  public double getPosition() {
+      return m_encoder.getPosition();
   }
-
+  
   /**
-   * Set the arm to position one
+   * Gets the current arm position (alias for getPosition)
    */
-  public void setPositionOne() {
-    setTargetPosition(POSITION_ONE);
-  }
-
-  /**
-   * Set the arm to position two
-   */
-  public void setPositionTwo() {
-    setTargetPosition(POSITION_TWO);
-  }
-
-  /**
-   * Increment the target position
-   * 
-   * @param increment Amount to increment (positive or negative)
-   */
-  public void incrementPosition(double increment) {
-    setTargetPosition(m_targetPosition + increment);
+  public double getCurrentPosition() {
+      return getPosition();
   }
 
   /**
    * Set a specific target position
-   * 
    * @param position Target position in rotations
    */
-  public void setTargetPosition(double position) {
-    // Set the target position
-    m_targetPosition = position;
-
-    // Apply the PID controller to reach the target
-    m_controller.setReference(m_targetPosition, ControlType.kPosition);
+  public void setPosition(double position) {
+      // Enforce soft limits
+      if (position > FORWARD_LIMIT) {
+          position = FORWARD_LIMIT;
+      } else if (position < REVERSE_LIMIT) {
+          position = REVERSE_LIMIT;
+      }
+      
+      // Store the target and apply to controller
+      m_controller.setReference(m_targetPosition, ControlType.kPosition, ClosedLoopSlot.kSlot0, 0);
+      m_controller.setReference(m_targetPosition, ControlType.kPosition);
   }
 
   /**
-   * @return The current position of the arm in rotations
+   * Increment the arm position
+   * @param increment Amount to increment (positive or negative)
    */
-  public double getCurrentPosition() {
-    return m_encoder.getPosition();
+  public void incrementPosition(double increment) {
+      setPosition(m_targetPosition + increment);
   }
 
   /**
-   * Check if the arm is at the target position
-   * 
-   * @return true if the arm is within tolerance of the target
+   * Check if arm is at the specified position
+   * @param position Position to check against
+   * @return true if within tolerance
    */
-  public boolean isAtTarget() {
-    return Math.abs(m_encoder.getPosition() - m_targetPosition) < POSITION_TOLERANCE;
-  }
-  
-  public void setCoralArmPower(double percentOutput) {
-    m_motor.set(percentOutput);
+  public boolean isAtPosition(double position) {
+      return Math.abs(getPosition() - position) < POSITION_TOLERANCE;
   }
 
   /**
-   * Stop the arm motor
+   * Stop the arm motor and maintain position
    */
-  public void stop() {
-    // When stopped, maintain the current position
-    m_targetPosition = m_encoder.getPosition();
-    m_controller.setReference(m_targetPosition, ControlType.kPosition);
+  public void stopAndHold() {
+      // Update target to current position and hold there
+      m_targetPosition = getPosition();
+      m_controller.setReference(m_targetPosition, ControlType.kPosition);
   }
 
   // ==== COMMAND FACTORIES ====
 
   /**
-   * Creates a command that moves the arm to position one
-   * 
-   * @return A command that moves the arm to position one
+   * Creates a command to increment the arm position up
    */
-  public Command positionZeroCommand() {
-    return Commands.runOnce(() -> setPositionZero(), this)
-        .andThen(Commands.waitUntil(this::isAtTarget));
+  public Command incrementUpCommand() {
+      return this.run(() -> {
+          double newTarget = getPosition() + INCREMENT_VALUE;
+          if (newTarget <= FORWARD_LIMIT) {
+              setPosition(newTarget);
+          }
+      }).withName("ArmIncrementUp");
   }
 
   /**
-   * Creates a command that moves the arm to position one
-   * 
-   * @return A command that moves the arm to position one
+   * Creates a command to increment the arm position down
    */
-  public Command positionOneCommand() {
-    return Commands.runOnce(() -> setPositionOne(), this)
-        .andThen(Commands.waitUntil(this::isAtTarget));
+  public Command incrementDownCommand() {
+      return this.run(() -> {
+          double newTarget = getPosition() - INCREMENT_VALUE;
+          if (newTarget >= REVERSE_LIMIT) {
+              setPosition(newTarget);
+          }
+      }).withName("ArmIncrementDown");
   }
 
   /**
-   * Creates a command that moves the arm to position two
-   * 
-   * @return A command that moves the arm to position two
+   * Creates a command to move to a preset position
+   * @param position Preset position to move to
    */
-  public Command positionTwoCommand() {
-    return Commands.runOnce(() -> setPositionTwo(), this)
-        .andThen(Commands.waitUntil(this::isAtTarget));
+  public Command setPositionCommand(ArmPosition position) {
+      return setPositionCommand(position.getPosition());
   }
 
   /**
-   * Creates a command that moves the arm to a specific position
-   * 
-   * @param position The target position in rotations
-   * @return A command that moves the arm to the specified position
+   * Creates a command to move to a specific position
+   * @param targetPosition Position to move to
    */
-  public Command positionCommand(double position) {
-    return Commands.runOnce(() -> setTargetPosition(position), this)
-        .andThen(Commands.waitUntil(this::isAtTarget));
+  public Command setPositionCommand(double targetPosition) {
+      return Commands.sequence(
+          // Set the position
+          Commands.runOnce(() -> setPosition(targetPosition)),
+          // Wait until we reach the target
+          Commands.waitUntil(() -> isAtPosition(targetPosition))
+      ).withName("MoveArmTo(" + targetPosition + ")");
   }
 
-  /**
-   * Creates a command that handles incremental arm movement based on button
-   * inputs
-   * 
-   * @param incrementUp     Supplier that returns true when the arm should be
-   *                        moved up
-   * @param incrementDown   Supplier that returns true when the arm should be
-   *                        moved down
-   * @param incrementAmount The amount to increment by each time (rotations)
-   * @return A command that handles incremental arm movement
-   */
-  public Command incrementalCommand(
-      BooleanSupplier incrementUp,
-      BooleanSupplier incrementDown,
-      double incrementAmount) {
-
-    return Commands.run(() -> {
-      // Each execution, check if buttons are pressed and apply increments
-      if (incrementUp.getAsBoolean()) {
-        incrementPosition(incrementAmount);
-      }
-      if (incrementDown.getAsBoolean()) {
-        incrementPosition(-incrementAmount);
-      }
-    }, this);
-  }
- 
-
-  /**
-   * Creates a command for direct motor control that properly stops when button is
-   * released
-   */
-  public Command setCoralArmPowerCommand(double percentOutput) {
-    // Use startEnd to explicitly define what happens when command starts and ends
-    return Commands.startEnd(
-        // Start action (when button is pressed)
-        () -> setCoralArmPower(percentOutput),
-        // End action (when button is released)
-        () -> setCoralArmPower(0),
-        this);
-  }
-}
+} // end of class

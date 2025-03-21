@@ -8,6 +8,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.AutonCommands;
+import frc.robot.commands.CoralArmCommands;
 import frc.robot.commands.SetWheelSpeedCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.AlgaeArmSubsystem;
@@ -34,6 +35,7 @@ public class RobotContainer {
     // -------------------- Subsystems --------------------
     private final DriveSubsystem m_robotDrive = new DriveSubsystem();
     private final CoralArmSubsystem m_coralArm = new CoralArmSubsystem();
+    private final CoralArmCommands m_armCommands = new CoralArmCommands(m_coralArm);
     private final CoralEffectorSubsystem m_coralEffector = new CoralEffectorSubsystem();
     private final AlgaeArmSubsystem m_algaeArm = new AlgaeArmSubsystem();
     private final AlgaeEffectorSubsystem m_algaeEffector = new AlgaeEffectorSubsystem();
@@ -48,7 +50,9 @@ public class RobotContainer {
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
-     */    
+     */   
+    
+
     public RobotContainer() {
         configureDefaultCommands();
         configureButtonBindings();
@@ -71,13 +75,6 @@ public class RobotContainer {
                 m_robotDrive)
         );
 
-        // Default arm command - Incremental control using POV buttons
-        m_coralArm.setDefaultCommand(
-            m_coralArm.incrementalCommand(
-                () -> operatorController.povLeft().getAsBoolean(),
-                () -> operatorController.povRight().getAsBoolean(),
-                0.01) // Small increment since this runs continuously
-        );
     }
 
     /**
@@ -123,15 +120,16 @@ public class RobotContainer {
      */
     private void configureOperatorButtons() {
         // Coral arm manual control
-        operatorController.a().whileTrue(
-            m_coralArm.setCoralArmPowerCommand(Constants.CORAL_ARM_FORWARD)
-        );
-        
-        operatorController.b().whileTrue(
-            m_coralArm.setCoralArmPowerCommand(Constants.CORAL_ARM_REVERSE)
-        );
+
+        // Preset positions
+        // operatorController.a().onTrue(m_armCommands.setStowed()); // TODO Test the manual controls before uncommenting this
+        // operatorController.b().onTrue(m_armCommands.setHighScore()); // TODO Test the manual controls before uncommenting this
+        // Incremental control
+        operatorController.povLeft().whileTrue(m_armCommands.incrementUp()); // TODO Test these manual controls first!
+        operatorController.povRight().whileTrue(m_armCommands.incrementDown()); // TODO Test these manual controls first!
 
         // Algae arm position presets
+
         /* TODO Test the elevator values, and adjust the speed constants.
         * I'll start working on presets which uses a different control mode.
         * I'm hoping that simple "power" at least works for now.
