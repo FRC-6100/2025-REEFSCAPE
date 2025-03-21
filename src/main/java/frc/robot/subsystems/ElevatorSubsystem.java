@@ -1,7 +1,7 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.servohub.ServoHub.ResetMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -35,7 +35,7 @@ public class ElevatorSubsystem extends SubsystemBase {
   private static final double kP = 0.1;
   private static final double kI = 0;
   private static final double kD = 0;
-  // private static final double kFF = 0.05; // Feed forward to counteract gravity
+  private static final double kFF = 0.05; // Feed forward to counteract gravity
 
   public ElevatorSubsystem() {
     // Initialize the motor
@@ -50,12 +50,13 @@ public class ElevatorSubsystem extends SubsystemBase {
     // config.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     // Configure PID
-    config.closedLoop.pid(kP, kI, kD);
-    // config.closedLoop.ff(kFF);
+    config.closedLoop.pidf(kP, kI, kD, kFF);
     // config.closedLoop.outputRange(OUTPUT_DOWN, OUTPUT_UP);
 
     // Apply configuration
     // m_motor.applyConfig(config); // FIXME applyConfig is not quite working
+
+    m_motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     // Get the encoder
     m_encoder = m_motor.getEncoder();
@@ -73,18 +74,13 @@ public class ElevatorSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // Publish current position and target to SmartDashboard
-    SmartDashboard.putNumber("Elevator Position", m_encoder.getPosition());
-    SmartDashboard.putNumber("Elevator Target", m_targetPosition);
-    SmartDashboard.putBoolean("Elevator At Target", isAtTarget());
-
-    // Report motor status to SmartDashboard
-    SmartDashboard.putNumber("Elevator Motor Position", m_encoder.getPosition());
-    SmartDashboard.putNumber("Elevator Motor Velocity", m_encoder.getVelocity());
-    SmartDashboard.putNumber("Elevator Motor Applied Output", m_motor.getAppliedOutput());
-    SmartDashboard.putNumber("Elevator Motor Current", m_motor.getOutputCurrent());
-    // SmartDashboard.putString("Elevator Motor Idle Mode",
-    // m_motor.getIdleMode().toString());
-
+    SmartDashboard.putNumber("Elevator/Target", m_targetPosition);
+    SmartDashboard.putBoolean("Elevator/At Target", isAtTarget());
+    SmartDashboard.putNumber("Elevator/Motor Position", m_encoder.getPosition());
+    SmartDashboard.putNumber("Elevator/Motor Velocity", m_encoder.getVelocity());
+    SmartDashboard.putNumber("Elevator/Motor Applied Output", m_motor.getAppliedOutput());
+    SmartDashboard.putNumber("Elevator/Motor Current", m_motor.getOutputCurrent());
+    
   }
 
   /**

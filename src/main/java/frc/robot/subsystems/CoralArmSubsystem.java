@@ -6,6 +6,8 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import java.util.function.BooleanSupplier;
@@ -40,7 +42,19 @@ public class CoralArmSubsystem extends SubsystemBase {
   private static final double kP = 0.1;
   private static final double kI = 0;
   private static final double kD = 0;
-  // private static final double kFF = 0.05; // Feed forward to counteract gravity
+  private static final double kFF = 0.05; // Feed forward to counteract gravity
+
+  /*
+   * You will need to tune the kFF value based on testing.
+   * Start with this value of 0.05, and then:
+   * If the arm still drops too quickly, increase the value
+   * If the arm struggles to move downward, decrease the value
+   * The SmartDashboard outputs will be very helpful for tuning - pay attention to the "Arm Motor Applied Output" to see the effect of your PIDF controller.
+   * This is a "simplistic" approach of constantly applying a bit of trickle power to counteract gravity. 
+   * A more advanced approach would be to use a gravity compensation that actually varies based on the arm's position.
+   * Start with this simple approach tonight/Saturday,
+   * and then we can discuss more advanced options as I work on actual position control modes.
+   */
 
   // Constants for position control
   private static final double MAX_OUTPUT = 0.4; // Limits max speed of the arm
@@ -56,13 +70,12 @@ public class CoralArmSubsystem extends SubsystemBase {
     config.idleMode(IdleMode.kBrake);
     config.smartCurrentLimit(20); // Appropriate for Neo550
 
-    // Configure PID
-    config.closedLoop.pid(kP, kI, kD);
-    // config.closedLoop.ff(kFF);
+    // Configure PIDF
+    config.closedLoop.pidf(kP, kI, kD, kFF);
     config.closedLoop.outputRange(MIN_OUTPUT, MAX_OUTPUT);
 
     // Apply configuration
-    // m_motor.applyConfig(config); // FIXME applyConfig is not quite working
+    m_motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     // Get the encoder
     m_encoder = m_motor.getEncoder();
@@ -80,15 +93,12 @@ public class CoralArmSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // Publish current position and target to SmartDashboard
-    SmartDashboard.putNumber("Arm Position", m_encoder.getPosition());
-    SmartDashboard.putNumber("Arm Target", m_targetPosition);
-    SmartDashboard.putBoolean("Arm At Target", isAtTarget());
-
-    // Report motor status to SmartDashboard
-    SmartDashboard.putNumber("Arm Motor Position", m_encoder.getPosition());
-    SmartDashboard.putNumber("Arm Motor Velocity", m_encoder.getVelocity());
-    SmartDashboard.putNumber("Arm Motor Applied Output", m_motor.getAppliedOutput());
-    SmartDashboard.putNumber("Arm Motor Current", m_motor.getOutputCurrent());
+    SmartDashboard.putNumber("Arm/Position", m_encoder.getPosition());
+    SmartDashboard.putNumber("Arm/Target", m_targetPosition);
+    SmartDashboard.putBoolean("Arm/At Target", isAtTarget());
+    SmartDashboard.putNumber("Arm/Velocity", m_encoder.getVelocity());
+    SmartDashboard.putNumber("Arm/Applied Output", m_motor.getAppliedOutput());
+    SmartDashboard.putNumber("Arm/Motor Current", m_motor.getOutputCurrent());
     // SmartDashboard.putString("Arm Motor Idle Mode",
     // m_motor.getIdleMode().toString());
 
