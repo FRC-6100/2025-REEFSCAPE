@@ -187,8 +187,6 @@ private void configureAutonOptions() {
         SmartDashboard.putData("Auto Selector", m_autoChooser);
     }
 
-
-
     /**
      * Creates and returns the autonomous command.
      *
@@ -198,48 +196,5 @@ private void configureAutonOptions() {
         // Return the selected autonomous command from the chooser
         return m_autoChooser.getSelected();
     }
-    /* --> Moved to AutonDriveForwardCommand.java
-    public Command getAutonomousCommand() {
-        // Create trajectory configuration
-        TrajectoryConfig config = new TrajectoryConfig(
-            AutoConstants.kMaxSpeedMetersPerSecond,
-            AutoConstants.kMaxAccelerationMetersPerSecondSquared
-        ).setKinematics(DriveConstants.kDriveKinematics);
-
-        // Create a simple forward trajectory
-        Trajectory trajectory = TrajectoryGenerator.generateTrajectory(
-            new Pose2d(0, 0, new Rotation2d(0)),
-            List.of(),
-            new Pose2d(1.2, 0, new Rotation2d(0)),
-            config
-        );
-
-        // Create PID controllers for trajectory following
-        var xController = new PIDController(AutoConstants.kPXController, 0, 0);
-        var yController = new PIDController(AutoConstants.kPYController, 0, 0);
-        var thetaController = new ProfiledPIDController(
-            AutoConstants.kPThetaController, 0, 0, 
-            AutoConstants.kThetaControllerConstraints
-        );
-        thetaController.enableContinuousInput(-Math.PI, Math.PI);
-
-        // Create the swerve controller command
-        SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
-            trajectory,
-            m_robotDrive::getPose,
-            DriveConstants.kDriveKinematics,
-            xController,
-            yController,
-            thetaController,
-            m_robotDrive::setModuleStates,
-            m_robotDrive
-        );
-
-        // Reset odometry to trajectory starting position
-        m_robotDrive.resetOdometry(trajectory.getInitialPose());
-
-        // Return the complete autonomous command
-        return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false));
-    } */
 
 }
