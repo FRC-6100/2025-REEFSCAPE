@@ -136,11 +136,11 @@ public class RobotContainer {
         * I'll start working on presets which uses a different control mode.
         * I'm hoping that simple "power" at least works for now.
         */ 
-        operatorController.x().whileTrue(
+        driverController.x().whileTrue(
             m_elevator.setElevatorPowerCommand(ElevatorConstants.SPEED_UP)
         );
         
-        operatorController.y().whileTrue(
+        driverController.y().whileTrue(
             m_elevator.setElevatorPowerCommand(ElevatorConstants.SPEED_DOWN)
         );
     
@@ -174,7 +174,7 @@ public class RobotContainer {
         );
         
         operatorController.povDown().whileTrue(
-            m_algaeArm.runAlgaeArmCommand(-Constants.ALGAE_ARM_DOWN)
+            m_algaeArm.runAlgaeArmCommand(Constants.ALGAE_ARM_DOWN)
         );
     }
 
