@@ -136,11 +136,11 @@ public class RobotContainer {
         * I'll start working on presets which uses a different control mode.
         * I'm hoping that simple "power" at least works for now.
         */ 
-        driverController.x().whileTrue(
+        driverController.leftTrigger().whileTrue(
             m_elevator.setElevatorPowerCommand(ElevatorConstants.SPEED_UP)
         );
         
-        driverController.y().whileTrue(
+        driverController.rightTrigger().whileTrue(
             m_elevator.setElevatorPowerCommand(ElevatorConstants.SPEED_DOWN)
         );
     
