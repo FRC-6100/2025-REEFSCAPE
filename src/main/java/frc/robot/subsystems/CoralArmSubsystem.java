@@ -133,14 +133,18 @@ public class CoralArmSubsystem extends SubsystemBase {
    */
   public void setPosition(double position) {
       // Enforce soft limits
+      /* FIXME Remove limits for now
       if (position > FORWARD_LIMIT) {
           position = FORWARD_LIMIT;
       } else if (position < REVERSE_LIMIT) {
           position = REVERSE_LIMIT;
-      }
+      } 
+      */
       
       // Store the target and apply to controller
-      m_controller.setReference(m_targetPosition, ControlType.kPosition, ClosedLoopSlot.kSlot0, 0.05);
+      // m_controller.setReference(m_targetPosition, ControlType.kPosition, ClosedLoopSlot.kSlot0, 0.05);
+      m_controller.setReference(position, ControlType.kPosition); // TODO Test this setReference
+      m_targetPosition = position; // Update target position
   }
 
   /**
